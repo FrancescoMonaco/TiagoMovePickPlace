@@ -114,6 +114,15 @@
     }
 
     void Tiago::computeObjectPosition(){
+        // Return feedback to the client
+            // Set the feedback header
+            feedback_.head_feedback.seq++;
+            feedback_.head_feedback.stamp = ros::Time::now();
+            feedback_.head_feedback.frame_id = "Goal feedback";
+            // Set the feedback message
+            feedback_.feedback_message = "Computing the position of the objects";
+            as_.publishFeedback(feedback_);
+
 
         as_.setSucceeded(result_);
         return;
