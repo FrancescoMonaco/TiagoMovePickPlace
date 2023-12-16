@@ -53,8 +53,24 @@
             feedback_.status = msg->status.status;
             as_.publishFeedback(feedback_);
         }
-            // Else it failed because of an obstacle
-            // => Motion Control Law takes control
+        else if (msg->status.status == 4 &&         // Else it failed because of an obstacle
+                                                    // => Motion Control Law takes control
+                (msg->status.text.find("oscillating") != std::string::npos)){
+            success_ = false;
+            // Return feedback to the client
+            // Set the feedback header
+            feedback_.head_feedback.seq++;
+            feedback_.head_feedback.stamp = ros::Time::now();
+            feedback_.head_feedback.frame_id = "Goal feedback";
+            // Set the feedback message
+            feedback_.feedback_message = "Narrow passage, switching to Motion Control Law";
+            // Set the status
+            feedback_.status = 0;
+            as_.publishFeedback(feedback_);
+
+            // MCL call
+        }
+
 
     }
 

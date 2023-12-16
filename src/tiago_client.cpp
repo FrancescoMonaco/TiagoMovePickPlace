@@ -3,23 +3,18 @@
 //*** Main
 int main(int argc, char **argv)
 {
-    // Take from the input the pose (x,y,z, t1, t2, t3) of the goal position
-    if(argc != 7)
-    {
-        ROS_INFO("usage: tiago_client x y z t1 t2 t3");
-        return 1;
-    }
-
-    // Extract the pose from the input
-    double x = atof(argv[1]);
-    double y = atof(argv[2]);
-    double z = atof(argv[3]);
-    double t1 = atof(argv[4]);
-    double t2 = atof(argv[5]);
-    double t3 = atof(argv[6]);
-
-    // Initialize the node
     ros::init(argc, argv, "tiago_client");
+    // Take from the input the pose (x,y,z, t1, t2, t3) of the goal position
+    double x, y, z, t1, t2, t3;
+    ros::NodeHandle fh;
+    fh.getParam("/tiago_client/x", x);
+    fh.getParam("/tiago_client/y", y);
+    fh.getParam("/tiago_client/z", z);
+    fh.getParam("/tiago_client/t1", t1);
+    fh.getParam("/tiago_client/t2", t2);
+    fh.getParam("/tiago_client/t3", t3);
+
+    // Initialize the action client
     actionlib::SimpleActionClient<group_04_a1::TiagoAction> ac("tiago_pose", true);
     ROS_INFO("Waiting for action server to start.");
     ac.waitForServer();
