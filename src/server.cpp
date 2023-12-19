@@ -5,6 +5,16 @@
 
     void Tiago::goalCB(){
         goal_ = as_.acceptNewGoal()->goal_pose;
+        //Wait some seconds for the arm to tuck
+        // Send feedback of tucking
+        // Set the feedback header
+        feedback_.head_feedback.seq++;
+        feedback_.head_feedback.stamp = ros::Time::now();
+        feedback_.head_feedback.frame_id = "Goal feedback";
+        // Set the feedback message
+        feedback_.feedback_message = "Tucking the arm";
+        as_.publishFeedback(feedback_);
+        ros::Duration(10.0).sleep();
         // Motion Law
         motion(goal_);
         // Send the goal to move_base_simple/goal
