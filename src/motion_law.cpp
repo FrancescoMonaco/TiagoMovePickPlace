@@ -24,7 +24,7 @@ bool hasObstacle() {
     int front_index = laser_scan.ranges.size() / 2;
 
     // Define a distance threshold for considering obstacles
-    double obstacle_threshold = 2.5;  // Adjust as needed
+    double obstacle_threshold = 3;  // Adjust as needed
 
     // Check if there's an obstacle in front of the robot based on the range value
     if (laser_scan.ranges[front_index] < obstacle_threshold) {
