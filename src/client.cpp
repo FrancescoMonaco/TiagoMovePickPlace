@@ -41,7 +41,7 @@ void feedbackCb(const group_04_a1::TiagoFeedbackConstPtr& feedback)
 group_04_a1::TiagoGoal createGoal(double x, double y, double z, double t1, double t2, double t3)
 {   
     // Check if the goal is valid
-    if(z != 0 || t3 != 0)
+    if(z != 0 || t1 != 0 || t2 != 0)
     {
         // Print an error message
         ROS_INFO("The goal is not valid, the robot can only move in the x-y plane");

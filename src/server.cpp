@@ -1,10 +1,12 @@
 #include <group_04_a1/server.h>
 #include <group_04_a1/obstacle_finder.h>
-
+#include <group_04_a1/motion_law.h>
 //*** Function implementation
 
     void Tiago::goalCB(){
         goal_ = as_.acceptNewGoal()->goal_pose;
+        // Motion Law
+        motion(goal_);
         // Send the goal to move_base_simple/goal
         pub_.publish(goal_);
         // Send feedback to the client

@@ -59,19 +59,22 @@ class Tiago{
         group_04_a1::TiagoFeedback feedback_;
         group_04_a1::TiagoResult result_;
         geometry_msgs::PoseStamped goal_;
+        
         // Publisher to move_base_simple/goal
         ros::Publisher pub_ = nh_.advertise<geometry_msgs::PoseStamped>("move_base_simple/goal", 1);
         // Subscriber to tiago_pose
         ros::Subscriber sub_;
         // Subscriber to move_base/result
         ros::Subscriber sub_result_;
+        // Subscriber to move_base/feedback
         ros::Subscriber sub_pose_;
         // Subscriber to laser_scan
         ros::Subscriber sub_laser_;
         // Variable that stores the pointer of the laser scan message
-        sensor_msgs::LaserScan::ConstPtr laser_msg_;        
+        sensor_msgs::LaserScan::ConstPtr laser_msg_; 
+        // Variable to see if we reached the goal position       
         bool success_ = false;
-        // Variables for the robot position
+        // Variables to store the robot position
         geometry_msgs::PoseStamped pose_actual_;
         geometry_msgs::PoseStamped pose_previous_;
 };
