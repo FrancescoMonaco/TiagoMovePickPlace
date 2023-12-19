@@ -1,4 +1,5 @@
 #include <group_04_a1/server.h>
+#include <group_04_a1/obstacle_finder.h>
 
 //*** Function implementation
 
@@ -113,6 +114,10 @@
         pose_actual_ = msg->feedback.base_position;
     }
 
+    void Tiago::laserCB(const sensor_msgs::LaserScan::ConstPtr& msg){
+        laser_msg_ = msg;
+    }
+
     void Tiago::computeObjectPosition(){
         // Return feedback to the client
             // Set the feedback header
@@ -123,7 +128,10 @@
             feedback_.feedback_message = "Computing the position of the objects";
             as_.publishFeedback(feedback_);
 
-
+        // Call the object position function, it wants as input sensor_msgs::LaserScan::ConstPtr&
+        std::vector<geometry_msgs::PoseStamped> obstacle_poses = obstacle_finder_function(laser_msg_);
+        // Return the result to the client
+        result_.result_points = obstacle_poses;
         as_.setSucceeded(result_);
         return;
     }

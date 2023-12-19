@@ -50,11 +50,11 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
+ add_message_files(
+   FILES
+   tiago_goal.msg
 #   Message2.msg
-# )
+ )
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -136,9 +136,14 @@ include_directories(
    src/server.cpp
  )
 
+ add_library(${PROJECT_NAME}_objfind
+   src/obstacle_finder.cpp
+ )
+
  target_link_libraries(
    ${PROJECT_NAME}_client
    ${PROJECT_NAME}_server
+   ${PROJECT_NAME}_objfind
    ${catkin_LIBRARIES}
  )
 
@@ -212,12 +217,17 @@ include_directories(
 
 add_executable(tiago_client src/tiago_client.cpp)
 add_executable(tiago_server src/tiago_server.cpp)
+add_executable(tiago_motion src/tiago_motion.cpp)
+
 
 add_dependencies(tiago_client group_04_a1_generate_messages_cpp)
 add_dependencies(tiago_server group_04_a1_generate_messages_cpp)
+add_dependencies(tiago_motion group_04_a1_generate_messages_cpp)
 
 target_link_libraries(tiago_client ${catkin_LIBRARIES} ${PROJECT_NAME}_client)
-target_link_libraries(tiago_server ${catkin_LIBRARIES} ${PROJECT_NAME}_server)
+target_link_libraries(tiago_server ${catkin_LIBRARIES} ${PROJECT_NAME}_server ${PROJECT_NAME}_objfind)
+target_link_libraries(tiago_motion ${catkin_LIBRARIES})
+
 
 #############
 ## Testing ##

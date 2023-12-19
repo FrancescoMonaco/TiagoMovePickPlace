@@ -11,6 +11,7 @@
 #include <actionlib_msgs/GoalStatusArray.h>
 #include <move_base_msgs/MoveBaseActionResult.h>
 #include <move_base_msgs/MoveBaseActionFeedback.h>
+#include <sensor_msgs/LaserScan.h>
 
 //*** Class definition
 class Tiago{
@@ -24,6 +25,7 @@ class Tiago{
                 sub_ = nh_.subscribe("tiago_pose", 1, &Tiago::feedCB, this);
                 sub_result_ = nh_.subscribe("move_base/result", 1, &Tiago::poseCB, this);
                 sub_pose_ = nh_.subscribe("move_base/feedback", 1, &Tiago::updateCB, this);
+                sub_laser_ = nh_.subscribe("scan", 1, &Tiago::laserCB, this);
             }
         
         ~Tiago(void){}
@@ -43,6 +45,9 @@ class Tiago{
     /// @brief Function that updates the data about the robot position
     void updateCB(const move_base_msgs::MoveBaseActionFeedback::ConstPtr& msg);
 
+    /// @brief Function that updates the data about the laser scan
+    void laserCB(const sensor_msgs::LaserScan::ConstPtr& msg);
+
     /// @brief Function that computes the position of the objects and sets the success of the goal
     void computeObjectPosition();
 
@@ -61,6 +66,10 @@ class Tiago{
         // Subscriber to move_base/result
         ros::Subscriber sub_result_;
         ros::Subscriber sub_pose_;
+        // Subscriber to laser_scan
+        ros::Subscriber sub_laser_;
+        // Variable that stores the pointer of the laser scan message
+        sensor_msgs::LaserScan::ConstPtr laser_msg_;        
         bool success_ = false;
         // Variables for the robot position
         geometry_msgs::PoseStamped pose_actual_;

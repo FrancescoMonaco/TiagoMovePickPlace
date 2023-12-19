@@ -12,12 +12,12 @@ void doneCb(const actionlib::SimpleClientGoalState& state,
     {
         pose_x.push_back(result->result_points[i].pose.position.x);
         pose_y.push_back(result->result_points[i].pose.position.y);
-        pose_z.push_back(result->result_points[i].pose.position.z);
+        //pose_z.push_back(result->result_points[i].pose.position.z);
     }
     // Print the list of the poses
     for(int i = 0; i < pose_x.size(); i++)
     {
-        ROS_INFO("Object %d in position: (%f, %f, %f)", i+1, pose_x[i], pose_y[i], pose_z[i]);
+        ROS_INFO("Object %d in position: (%f, %f)", i+1, pose_x[i], pose_y[i]);//, pose_z[i]);
     }
     ros::shutdown();
 }
