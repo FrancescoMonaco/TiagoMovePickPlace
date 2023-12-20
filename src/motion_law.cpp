@@ -38,7 +38,6 @@ bool hasObstacle() {
 }
 
 void odomCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& odom_msg) {
-    ROS_INFO("odomCallback");
     if (!goal_reached_) {
         // Compute velocities to move toward the goal based on odometry data
         geometry_msgs::Twist vel_cmd;
@@ -49,20 +48,20 @@ void odomCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& odom
         // Check if there is an obstacle in front of the robot
         if (hasObstacle()) {
             // If there is an obstacle, rotate the robot
-            vel_cmd.linear.x = 0.0;
-            vel_cmd.angular.z = 2;  // Adjust angular velocity as needed for rotatio
+            vel_cmd.linear.x = -0.5;
+            vel_cmd.angular.z = 0.3;  // Adjust angular velocity as needed for rotatio
 			pass = true;
             
         } else {
             // If there is no obstacle, move the robot forward
-            vel_cmd.linear.x = 1.2;  // Adjust linear velocity as needed for forward movement
+            vel_cmd.linear.x = 1;  // Adjust linear velocity as needed for forward movement
             vel_cmd.angular.z = 0.0;
         }
 
         // Publish computed velocities
         vel_pub_.publish(vel_cmd);
-        ROS_INFO("Moving toward goal");
-        // Check if the goal is reached (for example, based on a distance threshold)
+
+        // Check if the goal is reached (based on a distance threshold)
        /* if (isGoalReached(current_pose, goal_)) {
             goal_reached_ = true;
             // Stop the robot when the goal is reached

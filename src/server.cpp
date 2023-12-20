@@ -12,9 +12,9 @@
         feedback_.head_feedback.stamp = ros::Time::now();
         feedback_.head_feedback.frame_id = "Goal feedback";
         // Set the feedback message
-        feedback_.feedback_message = "Tucking the arm";
+        feedback_.feedback_message = "Tucking the arm and activating ML";
         as_.publishFeedback(feedback_);
-        ros::Duration(10.0).sleep();
+        ros::Duration(13.0).sleep();
         // Motion Law
         motion(goal_);
         // Send the goal to move_base_simple/goal
@@ -25,7 +25,7 @@
         feedback_.head_feedback.stamp = ros::Time::now();
         feedback_.head_feedback.frame_id = "Goal feedback";
          // Set the feedback message
-        feedback_.feedback_message = "Goal sent";
+        feedback_.feedback_message = "Goal sent to move_base";
         as_.publishFeedback(feedback_);
     }
 
@@ -81,7 +81,7 @@
             feedback_.status = 0;
             as_.publishFeedback(feedback_);
 
-            // MCL call
+            motion(goal_);
         }
 
 
