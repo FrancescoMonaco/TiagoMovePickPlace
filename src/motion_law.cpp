@@ -7,11 +7,17 @@ ros::Publisher vel_pub_;
 ros::Subscriber laser_sub_;
 ros::Subscriber odom_sub_;
 
+/**
+*  Read the data form LaserScan and store them in laser_scan
+*/
 void laserCallback(const sensor_msgs::LaserScan::ConstPtr& laser_msg) {
         // Store the laser scan data for later use
         laser_scan = *laser_msg;
     }
 
+/**
+* Check if there is an obstacle in front of the robot
+*/
 bool hasObstacle() {
     // Check if laser scan data is available
     if (laser_scan.ranges.empty()) {
@@ -24,7 +30,7 @@ bool hasObstacle() {
     int front_index = laser_scan.ranges.size() / 2;
 
     // Define a distance threshold for considering obstacles
-    double obstacle_threshold = 3;  // Adjust as needed
+    double obstacle_threshold = 3;
 
     // Check if there's an obstacle in front of the robot based on the range value
     if (laser_scan.ranges[front_index] < obstacle_threshold) {
@@ -36,7 +42,9 @@ bool hasObstacle() {
     // No obstacle detected
     return false;
 }
-
+/**
+* Function that sends the commands to move the robot
+*/
 void odomCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& odom_msg) {
     ROS_INFO("odomCallback");
     if (!goal_reached_) {
@@ -50,12 +58,12 @@ void odomCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& odom
         if (hasObstacle()) {
             // If there is an obstacle, rotate the robot
             vel_cmd.linear.x = 0.0;
-            vel_cmd.angular.z = 2;  // Adjust angular velocity as needed for rotatio
-			pass = true;
+            vel_cmd.angular.z = 2; 
+			pass = true;  //the narrow corridor is crossed 
             
         } else {
             // If there is no obstacle, move the robot forward
-            vel_cmd.linear.x = 1.2;  // Adjust linear velocity as needed for forward movement
+            vel_cmd.linear.x = 1.2;
             vel_cmd.angular.z = 0.0;
         }
 
@@ -73,14 +81,19 @@ void odomCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& odom
     }
 }
 
+/**
+* Create the nodes and subscribe to the specific topics
+*/
 void motion (geometry_msgs::PoseStamped pos){
 	ros::NodeHandle nh_, nh1_, nh2_;
     vel_pub_ = nh_.advertise<geometry_msgs::Twist>("mobile_base_controller/cmd_vel", 1);
 	laser_sub_ = nh1_.subscribe("scan", 1, laserCallback);
     odom_sub_ = nh2_.subscribe("robot_pose", 1, odomCallback);
+    // repeat until the robot passes the narrow corridor 
 	while (!pass){
         ros::spinOnce();
 	}
+    // close all the nodes allowing the movement of the robot using move_base
 	vel_pub_.shutdown();
 	laser_sub_.shutdown();
 	odom_sub_.shutdown();
