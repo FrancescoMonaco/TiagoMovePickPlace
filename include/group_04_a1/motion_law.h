@@ -16,3 +16,5 @@ bool hasObstacle();
 void odomCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& odom_msg);
 
 void motion (geometry_msgs::PoseStamped pos);
+
+void recovery_rotation();

@@ -12,10 +12,18 @@
         feedback_.head_feedback.stamp = ros::Time::now();
         feedback_.head_feedback.frame_id = "Goal feedback";
         // Set the feedback message
-        feedback_.feedback_message = "Tucking the arm and activating ML";
+        feedback_.feedback_message = "Waiting for the arm to tuck";
         as_.publishFeedback(feedback_);
         ros::Duration(13.0).sleep();
         // Motion Law
+        // Send feedback of motion law
+        // Set the feedback header
+        feedback_.head_feedback.seq++;
+        feedback_.head_feedback.stamp = ros::Time::now();
+        feedback_.head_feedback.frame_id = "Goal feedback";
+        // Set the feedback message
+        feedback_.feedback_message = "Motion Control Law activated";
+        as_.publishFeedback(feedback_);
         motion(goal_);
         // Send the goal to move_base_simple/goal
         pub_.publish(goal_);
@@ -81,7 +89,9 @@
             feedback_.status = 0;
             as_.publishFeedback(feedback_);
 
-            motion(goal_);
+            recovery_rotation();
+            // Send the goal to move_base_simple/goal
+            pub_.publish(goal_);
         }
 
 
@@ -95,10 +105,9 @@
         }
         else{
             // Compare the actual position with the previous one
-            // If the truncation of the actual position is equal to the truncation of the previous one
-            // => The robot is not moving
-            if((int)(pose_actual_.pose.position.x*1000) == (int)(pose_previous_.pose.position.x*1000) &&
-                (int)(pose_actual_.pose.position.y*1000) == (int)(pose_previous_.pose.position.y*1000)){
+            // We truncate at 3 decimals to deal with noise
+            if((int)(pose_actual_.position.x*1000) == (int)(pose_previous_.position.x*1000) &&
+                (int)(pose_actual_.position.y*1000) == (int)(pose_previous_.position.y*1000)){
                 // Return feedback to the client
                 // Set the feedback header
                 feedback_.head_feedback.seq++;
@@ -120,10 +129,10 @@
         }
     }
 
-    void Tiago::updateCB(const move_base_msgs::MoveBaseActionFeedback::ConstPtr& msg){
+    void Tiago::updateCB(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg){
         // Save the old position
         pose_previous_= pose_actual_;
-        pose_actual_ = msg->feedback.base_position;
+        pose_actual_ = msg->pose.pose;
     }
 
     void Tiago::laserCB(const sensor_msgs::LaserScan::ConstPtr& msg){
