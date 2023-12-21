@@ -87,11 +87,14 @@ void motion (geometry_msgs::PoseStamped pos){
 	}
 
 void recovery_rotation(){
+    for (int i = 0; i < 50; i++){
         geometry_msgs::Twist vel_cmd;
 
             vel_cmd.linear.x = -0.1;
-            vel_cmd.angular.z = -0.7;  // Rotation
+            vel_cmd.angular.z = -1.7;  // Rotation
         // Publish computed velocities
         vel_pub_.publish(vel_cmd);
+        ros::Duration(0.3).sleep();
+    }
         return;
 }
