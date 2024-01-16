@@ -1,0 +1,22 @@
+<launch>
+    <include file="$(find tiago_iaslab_simulation)/launch/start_simulation.launch">
+    <arg name="world_name" value="robotics_library" />
+    </include>
+
+    <include file="$(find tiago_iaslab_simulation)/launch/navigation.launch" >
+    </include>
+
+    <node name="tiago_pose" pkg="group_04_a1" type="tiago_server" output="screen">
+    </node>
+
+    <!-- In input as arguments we have x y z alpha beta gamma -->
+    <node name="tiago_client" pkg="group_04_a1" type="tiago_client" output="screen">
+        <param name="x" type="double" value="10.8" />    
+        <param name="y" type="double" value="0.13" />
+        <param name="z" type="double" value="0" />
+        <param name="t1" type="double" value="0" />
+        <param name="t2" type="double" value="0" />
+        <param name="t3" type="double" value="200" />
+    </node>
+
+</launch>

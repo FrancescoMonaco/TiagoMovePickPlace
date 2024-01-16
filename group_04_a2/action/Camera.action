@@ -1,0 +1,9 @@
+# Define the goal
+bool color_recognition
+---
+# Define the result
+geometry_msgs/Pose[] poses
+int32[] ids
+---
+# Define the feedback
+bool failed
