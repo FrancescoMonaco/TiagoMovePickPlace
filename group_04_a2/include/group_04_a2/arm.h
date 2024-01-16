@@ -56,12 +56,34 @@ private:
     /// @param ids
     void addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::vector<int>& ids);
 
+    /// @brief Subroutine to pick the object using intermediate poses
+    /// @param object, pose of the object to pick
+    /// @param id, id of the object to pick
+    void pickObj(const geometry_msgs::Pose& object, int id);
+
+    /// @brief Given a path of poses, move the arm
+    /// @param path, path of poses
+    void moveArmPath(const std::vector<geometry_msgs::Pose>& path);
+
+    /// @brief Given an object id, return the dimensions of the object
+    /// @param id of the object
+    std::vector<double> returnDimesions(int id);
+
     /// @brief Open or close the gripper
     /// @param open, true if open, false if close
     void gripper(bool open, int id);
 
+    /// @brief Attach the object to the gripper and close the gripper
+    /// @param id of the object
     void attachObjectToGripper(int id);
+
+    /// @brief Detach the object from the gripper and open the gripper
+    /// @param id of the object
     void detachObjectFromGripper(int id);
+
+    /// @brief Move the arm to a safe pose or tuck it
+    /// @param tuck, true if tuck, false if safe pose
+    void safePose(bool tuck);
 };
 
 

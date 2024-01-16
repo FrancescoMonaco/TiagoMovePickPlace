@@ -41,20 +41,20 @@ int main(int argc, char **argv)
     
     
     // Go to the first object
-    
+    /*
     goal = createGoal(pose_1.pose.position.x, pose_1.pose.position.y, pose_1.pose.position.z, pose_1.pose.orientation.x, pose_1.pose.orientation.y, pose_1.pose.orientation.z, pose_1.pose.orientation.w);
     ac.sendGoal(goal, &doneCb, &activeCb, &feedbackCb);
     // Wait for the robot to reach the position
     ac.waitForResult();
-    
+    */
     
     // Go to the second object
-    /*
+    
     goal = createGoal(pose_2.pose.position.x, pose_2.pose.position.y, pose_2.pose.position.z, pose_2.pose.orientation.x, pose_2.pose.orientation.y, pose_2.pose.orientation.z, pose_2.pose.orientation.w);
     ac.sendGoal(goal, &doneCb, &activeCb, &feedbackCb);
     // Wait for the robot to reach the position
     ac.waitForResult();
-    */
+    
    
     // Get the camera results
     group_04_a2::CameraResultConstPtr camera_pointer = cameraDetection();

@@ -1,7 +1,7 @@
 #include <group_04_a2/arm.h>
 
 //RETURNS COLLISION BOXES FOR EACH SOLID
-std::vector<double> returnDimesions(int id)
+std::vector<double> Arm::returnDimesions(int id)
 {
     //if object is BLUE
     if(id == 1) { return std::vector<double> {0.050301,0.054000,0.1}; }
@@ -17,34 +17,28 @@ std::vector<double> returnDimesions(int id)
 }
 
 
-void moveArmPath(const std::vector<geometry_msgs::Pose>& path)
+void Arm::moveArmPath(const std::vector<geometry_msgs::Pose>& path)
 {
     ROS_INFO("-----STARTING PATH------");
 
+    moveit::planning_interface::MoveGroupInterface move_group_interface("arm_torso");
+    const moveit::core::JointModelGroup* joint_model_group = move_group_interface.getCurrentState()->getJointModelGroup("arm_torso");
+
+    move_group_interface.setNumPlanningAttempts(15);
+    move_group_interface.setPlanningTime(5);
+
+    moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+
     for(int i=0; i<path.size(); i++)
     {
-        moveit::planning_interface::MoveGroupInterface move_group_interface("arm_torso");
-        const moveit::core::JointModelGroup* joint_model_group = move_group_interface.getCurrentState()->getJointModelGroup("arm_torso");
-        geometry_msgs::PoseStamped current_pose = move_group_interface.getCurrentPose();
-
-        // Specify the planner parameters as a map
-        std::map<std::string, std::string> planner_params;
-        planner_params["range"] = "0.1"; // Set the planning range parameter
-        //planner_params["allowed_planning_time"] = "20"; 
-        // Set the planner parameters
-        move_group_interface.setPlannerParams("RRTConnectkConfigDefault", "arm_torso", planner_params);
-        move_group_interface.setNumPlanningAttempts(15);
-        //move_group_interface.setPlanningTime(20);
-
         geometry_msgs::Pose step = path[i];
         move_group_interface.setPoseTarget(step);
 
-        moveit::planning_interface::MoveGroupInterface::Plan my_plan;
         bool success = (move_group_interface.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
     
         if (success)
         {
-            move_group_interface.move();
+            move_group_interface.execute(my_plan);
             ROS_INFO("ONE STEP DONE");
         }
         else
@@ -52,7 +46,6 @@ void moveArmPath(const std::vector<geometry_msgs::Pose>& path)
             ROS_ERROR("FAILED TO PLAN NEXT MOVE --- ABORT");
             break;
         }
-
     }
 
     ROS_INFO("-----ENDING PATH------");
@@ -61,26 +54,28 @@ void moveArmPath(const std::vector<geometry_msgs::Pose>& path)
 }
 
 
-
-
 //WORK IN PROGRESS - (collision free)
 //GO 30 cm above the objects, then ....
-void pickObj(const geometry_msgs::Pose& object, int id)
+void Arm::pickObj(const geometry_msgs::Pose& object, int id)
 {
+    // Move to a safe pose
+    safePose(false);
+
     if(id == 1){
     //BLUE EXAGON ARM POSE - OK
     std::vector<geometry_msgs::Pose> path_blue;
 
     tf2::Quaternion q;
-    geometry_msgs::Pose pose_0;
-    pose_0.position = object.position;
-    pose_0.position.z = pose_0.position.z - returnDimesions(id)[1] / 2 +0.20;
+
+    geometry_msgs::Pose pose_1;
+    pose_1.position = object.position;
+    pose_1.position.z = pose_1.position.z - returnDimesions(id)[1] / 2 +0.20;
     q.setRPY(0, +M_PI/2, 0);
-    pose_0.orientation.x = q.x();
-    pose_0.orientation.y = q.y();
-    pose_0.orientation.z = q.z();
-    pose_0.orientation.w = q.w();
-    path_blue.push_back(pose_0); 
+    pose_1.orientation.x = q.x();
+    pose_1.orientation.y = q.y();
+    pose_1.orientation.z = q.z();
+    pose_1.orientation.w = q.w();
+    path_blue.push_back(pose_1); 
     
      moveArmPath(path_blue);
     
@@ -186,11 +181,15 @@ void Arm::pickObject(const group_04_a2::ArmGoalConstPtr &goal)
     std::vector<geometry_msgs::Pose> objects = goal->poses;
     std::vector<int> ids = goal->ids;
 
+    // Add the objects to the collision objects
     addCollisionObjects(objects, ids);
+    // Move the arm to the object
     pickObj(objects[0], ids[0]);
+    // Grip and attach the object
     gripper(false, ids[0]);
-    ros::Duration(20.3).sleep();
-    gripper(true, ids[0]); 
+
+    // Tuck again the arm as in the beginning
+    safePose(true);
 
     as_.setSucceeded();
 }
@@ -262,31 +261,11 @@ void Arm::addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::ve
 
 void Arm::gripper(bool open, int id)
 {
-    // Create a publisher for the gripper command
-    ros::Publisher gripperPub = nh_.advertise<trajectory_msgs::JointTrajectory>("/parallel_gripper_controller/command", 10);
+    // Remove the object from the collision objects
+    std::vector<std::string> object_ids;
+    object_ids.push_back("object" + std::to_string(id));
+    planning_scene_interface_.removeCollisionObjects(object_ids);
 
-    // Wait for the publisher to be ready
-    ros::Duration(1.0).sleep();
-
-    // Create a JointTrajectory message
-    trajectory_msgs::JointTrajectory gripperCommand;
-    gripperCommand.joint_names.push_back("parallel_gripper_joint");
-
-    // Create a JointTrajectoryPoint and set the position
-    trajectory_msgs::JointTrajectoryPoint point;
-    point.positions.push_back(open ? 0.0 : 0.05);
-    gripperCommand.points.push_back(point);
-
-    // Set the duration for the point
-    gripperCommand.points[0].time_from_start = ros::Duration(2.0);
-
-    // Publish the gripper command
-    gripperPub.publish(gripperCommand);
-
-    // Wait for a moment to allow the gripper to move
-    ros::Duration(2.0).sleep();
-
-    // Perform object attachment/detachment based on the gripper state
     if (open)
     {
         detachObjectFromGripper(id);
@@ -295,6 +274,23 @@ void Arm::gripper(bool open, int id)
     {
         attachObjectToGripper(id);
     }
+    // Create a publisher for the gripper command
+    ros::Publisher gripperPub = nh_.advertise<trajectory_msgs::JointTrajectory>("/parallel_gripper_controller/command", 10);
+
+    // Create a message for the gripper command
+    trajectory_msgs::JointTrajectory gripperMsg;
+    gripperMsg.header.stamp = ros::Time::now();
+    gripperMsg.joint_names.push_back("parallel_gripper_joint");
+    trajectory_msgs::JointTrajectoryPoint gripperPoint;
+    gripperPoint.positions.push_back(open ? 0.04 : 0.0);
+    gripperPoint.time_from_start = ros::Duration(0.5);
+    gripperMsg.points.push_back(gripperPoint);
+
+    // Publish the gripper command
+    gripperPub.publish(gripperMsg);
+
+    // Perform object attachment/detachment based on the gripper state
+
 
     // Close the publisher
     gripperPub.shutdown();
@@ -367,5 +363,67 @@ void Arm::detachObjectFromGripper(int id)
     else
     {
         ROS_ERROR("Failed to detach object from arm_7_link");
+    }
+}
+
+void Arm::safePose(bool tuck){
+        
+    // Go up again before tucking
+    moveit::planning_interface::MoveGroupInterface move_group_interface("arm_torso");
+    const moveit::core::JointModelGroup* joint_model_group = move_group_interface.getCurrentState()->getJointModelGroup("arm_torso");
+    // Print the number of joints in the arm
+    ROS_INFO("Arm with %d joints", joint_model_group->getVariableCount());
+    
+    move_group_interface.setNumPlanningAttempts(15);
+    move_group_interface.setPlanningTime(5);
+
+    moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+
+    // Set the initial position
+    std::vector<double> initial_position = {0.140, 4 * (M_PI / 180), 45 * (M_PI / 180), -80 * (M_PI / 180), 33 * (M_PI / 180), -90 * (M_PI / 180), 78 * (M_PI / 180), 0};
+    move_group_interface.setJointValueTarget(initial_position);
+
+    bool success = (move_group_interface.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+
+    if (success)
+    {
+        move_group_interface.execute(my_plan);
+        ROS_INFO("Initial position done");
+    }
+    else
+    {
+        ROS_ERROR("FAILED TO PLAN INITIAL POSITION --- ABORT");
+        return;
+    }
+
+    if(tuck){
+        // Tuck again the arm as in the beginning
+        moveit::planning_interface::MoveGroupInterface move_group_interface("arm_torso");
+        const moveit::core::JointModelGroup* joint_model_group = move_group_interface.getCurrentState()->getJointModelGroup("arm_torso");
+        // Print the number of joints in the arm
+        ROS_INFO("Arm with %d joints", joint_model_group->getVariableCount());
+        
+        move_group_interface.setNumPlanningAttempts(15);
+        move_group_interface.setPlanningTime(5);
+
+        moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+
+        // Set the initial position
+        std::vector<double> initial_position = {0.185, 11 * (M_PI / 180), -84 * (M_PI / 180), -20 * (M_PI / 180), 103 * (M_PI / 180), -90 * (M_PI / 180), 80 * (M_PI / 180), 0};
+
+        move_group_interface.setJointValueTarget(initial_position);
+
+        bool success = (move_group_interface.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+
+        if (success)
+        {
+            move_group_interface.execute(my_plan);
+            ROS_INFO("Arm tucked");
+        }
+        else
+        {
+            ROS_ERROR("FAILED TO TUCK ARM --- ABORT");
+            return;
+        }
     }
 }
