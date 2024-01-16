@@ -6,6 +6,14 @@
 # Node artifact files
 node_modules/
 dist/
+.vscode/
+IntelligentRobotics2223/
+tiago_iaslab_simulation/
+beginner_tutorials/
+apriltag/
+apriltag_ros/
+exercises/
+gazebo_ros_link_attacher/
 
 # Compiled Java class files
 *.class
