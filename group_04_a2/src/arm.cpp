@@ -31,20 +31,50 @@ void Arm::moveArmPath(const std::vector<geometry_msgs::Pose>& path)
 
     for(int i=0; i<path.size(); i++)
     {
-        geometry_msgs::Pose step = path[i];
-        move_group_interface.setPoseTarget(step);
+        // If its the last pose, do a cartesian path
+        if(i == path.size()-1)
+        {
+            geometry_msgs::Pose current_pose = move_group_interface.getCurrentPose().pose;
+            std::vector<geometry_msgs::Pose> waypoints;
+            waypoints.push_back(current_pose);
+            waypoints.push_back(path[i]);
 
-        bool success = (move_group_interface.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-    
-        if (success)
-        {
-            move_group_interface.execute(my_plan);
-            ROS_INFO("ONE STEP DONE");
+            moveit_msgs::RobotTrajectory trajectory;
+            const double jump_threshold = 0.0;
+            const double eef_step = 0.01;
+            double fraction = move_group_interface.computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
+            my_plan.trajectory_ = trajectory;
+
+            bool success = (fraction == 1.0);
+
+            if (success)
+            {
+                move_group_interface.execute(my_plan);
+                ROS_INFO("ONE STEP DONE");
+            }
+            else
+            {
+                ROS_ERROR("FAILED TO PLAN NEXT MOVE --- ABORT");
+                break;
+            }
         }
-        else
-        {
-            ROS_ERROR("FAILED TO PLAN NEXT MOVE --- ABORT");
-            break;
+        else{
+
+            geometry_msgs::Pose step = path[i];
+            move_group_interface.setPoseTarget(step);
+
+            bool success = (move_group_interface.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+        
+            if (success)
+            {
+                move_group_interface.execute(my_plan);
+                ROS_INFO("ONE STEP DONE");
+            }
+            else
+            {
+                ROS_ERROR("FAILED TO PLAN NEXT MOVE --- ABORT");
+                break;
+            }
         }
     }
 
