@@ -22,8 +22,9 @@ void Arm::moveArmPath(const std::vector<geometry_msgs::Pose>& path)
     ROS_INFO("-----STARTING PATH------");
 
     moveit::planning_interface::MoveGroupInterface move_group_interface("arm_torso");
-    const moveit::core::JointModelGroup* joint_model_group = move_group_interface.getCurrentState()->getJointModelGroup("arm_torso");
-
+    //const moveit::core::JointModelGroup* joint_model_group = move_group_interface.getCurrentState()->getJointModelGroup("arm_torso");
+    move_group_interface.setPlannerId("RTTConnectkConfigDefault");
+    move_group_interface.setPoseReferenceFrame("base_footprint"); //or base_footprint
     move_group_interface.setNumPlanningAttempts(15);
     move_group_interface.setPlanningTime(5);
 
@@ -67,7 +68,8 @@ void Arm::moveArmPath(const std::vector<geometry_msgs::Pose>& path)
         
             if (success)
             {
-                move_group_interface.execute(my_plan);
+                // move_group_interface.setStartStateToCurrentState() 
+                move_group_interface.execute(my_plan); //
                 ROS_INFO("ONE STEP DONE");
             }
             else
@@ -220,7 +222,7 @@ void Arm::pickObject(const group_04_a2::ArmGoalConstPtr &goal)
     std::vector<int> ids = goal->ids;
 
     // Add the objects to the collision objects
-    addCollisionObjects(objects, ids);
+    addCollisionObjects(objects, ids, true);
     // Move the arm to the object
     pickObj(objects[0], ids[0]);
     // Grip and attach the object
@@ -229,70 +231,149 @@ void Arm::pickObject(const group_04_a2::ArmGoalConstPtr &goal)
     // Tuck again the arm as in the beginning
     safePose(true);
 
+    // After picking, clear the planning scene? Or keep it to reuse the collision objects?
+
     as_.setSucceeded();
 }
 
 void Arm::placeObject(const group_04_a2::ArmGoalConstPtr &goal)
-{
+{   
+    std::vector<geometry_msgs::Pose> objects = goal->poses;
+    std::vector<int> ids = goal->ids;
+    addCollisionObjects(objects, ids, false);
+    // Move the arm to the object
+    safePose(false);
+    // Detach the object
+    //gripper(true, goal->ids[0]);
+
+    // Tuck again the arm as in the beginning
+    safePose(true);
+
+    as_.setSucceeded();
 }
 
-void Arm::addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::vector<int>& ids)
+void Arm::addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::vector<int>& ids, bool pick)
 {
     std::vector<moveit_msgs::CollisionObject> collision_objects;
-    
-    // Add the objects to the collision objects
-    for(int i = 0; i < objects.size(); i++)
+    if (pick)
     {
-        moveit_msgs::CollisionObject collision_object;
-        collision_object.header.frame_id = "base_footprint";
-        collision_object.id = "object" + std::to_string(ids[i]);
 
-        // Use a box as the collision object
-        shape_msgs::SolidPrimitive object_primitive;
-        object_primitive.type = shape_msgs::SolidPrimitive::BOX;
-        std::vector<double> dim_s = returnDimesions(ids[i]);
-        object_primitive.dimensions.resize(3);
+        // Add the objects to the collision objects
+        for(int i = 0; i < objects.size(); i++)
+        {
+            moveit_msgs::CollisionObject collision_object;
+            collision_object.header.frame_id = "base_footprint";
+            collision_object.id = "object" + std::to_string(ids[i]);
 
-        object_primitive.dimensions[0] = dim_s[0];
-        object_primitive.dimensions[1] = dim_s[1];
-        object_primitive.dimensions[2] = dim_s[2];
+            // Use a box as the collision object
+            shape_msgs::SolidPrimitive object_primitive;
+            object_primitive.type = shape_msgs::SolidPrimitive::BOX;
+            std::vector<double> dim_s = returnDimesions(ids[i]);
+            object_primitive.dimensions.resize(3);
 
-        // Set the pose of the collision object
-        geometry_msgs::Pose pose = objects[i];
-        if(ids[i] == 2) { pose.position.z -= dim_s[1]/2;}
-        else { pose.position.z -= dim_s[1]; }
+            object_primitive.dimensions[0] = dim_s[0];
+            object_primitive.dimensions[1] = dim_s[1];
+            object_primitive.dimensions[2] = dim_s[2];
 
-        pose.orientation = objects[i].orientation;
+            // Set the pose of the collision object
+            geometry_msgs::Pose pose = objects[i];
+            if(ids[i] == 2) { pose.position.z -= dim_s[1]/2;}
+            else { pose.position.z -= dim_s[1]; }
 
-        collision_object.primitive_poses.push_back(pose);
-        collision_object.primitives.push_back(object_primitive);
-        collision_object.operation = moveit_msgs::CollisionObject::ADD;
+            pose.orientation = objects[i].orientation;
 
-        collision_objects.push_back(collision_object);
+            collision_object.primitive_poses.push_back(pose);
+            collision_object.primitives.push_back(object_primitive);
+            collision_object.operation = moveit_msgs::CollisionObject::ADD;
+
+            collision_objects.push_back(collision_object);
+        }
+
+        // Add the table to the collision object
+        moveit_msgs::CollisionObject table_coll_object;
+        table_coll_object.header.frame_id = "map";
+        table_coll_object.id = "table";
+        shape_msgs::SolidPrimitive primitive;
+        primitive.type = shape_msgs::SolidPrimitive::BOX;
+        primitive.dimensions.resize(3);
+        primitive.dimensions[0] = 0.934400; // x dimension
+        primitive.dimensions[1] = 0.934400;  // y dimension
+        primitive.dimensions[2] = 0.774700;  // z dimension
+
+        geometry_msgs::Pose pose;
+        pose.position.x = 1.2451+6.55;
+        pose.position.y = -1.6131-1.35;
+        pose.position.z = primitive.dimensions[2] / 2; //NOT 0; IDK, MY TABLE SEEMS HALF IN THE GROUND
+
+        table_coll_object.primitives.push_back(primitive);
+        table_coll_object.primitive_poses.push_back(pose);
+        table_coll_object.operation = moveit_msgs::CollisionObject::ADD;
+
+        collision_objects.push_back(table_coll_object);
     }
+    else{ 
+        // Tables for the place task
+       moveit_msgs::CollisionObject red_pill;
+        red_pill.header.frame_id = "map";
+        red_pill.id = "red_pill";
+        shape_msgs::SolidPrimitive primitive;
+        primitive.type = shape_msgs::SolidPrimitive::CYLINDER;
+        primitive.dimensions.resize(2);
+        primitive.dimensions[0] = 0.70; // height
+        primitive.dimensions[1] = 0.22;  // radius
 
-    // Add the table to the collision object
-    moveit_msgs::CollisionObject table_coll_object;
-    table_coll_object.header.frame_id = "map";
-    table_coll_object.id = "table";
-    shape_msgs::SolidPrimitive primitive;
-    primitive.type = shape_msgs::SolidPrimitive::BOX;
-    primitive.dimensions.resize(3);
-    primitive.dimensions[0] = 0.934400; // x dimension
-    primitive.dimensions[1] = 0.934400;  // y dimension
-    primitive.dimensions[2] = 0.774700;  // z dimension
+        geometry_msgs::Pose pose;
+        pose.position.x = 4.0073+6.55;
+        pose.position.y = 1.0159-1.35;
+        pose.position.z = 0.345;
 
-    geometry_msgs::Pose pose;
-    pose.position.x = 1.2451+6.55;
-    pose.position.y = -1.6131-1.35;
-    pose.position.z = primitive.dimensions[2] / 2; //NOT 0; IDK, MY TABLE SEEMS HALF IN THE GROUND
+        red_pill.primitives.push_back(primitive);
+        red_pill.primitive_poses.push_back(pose);
+        red_pill.operation = moveit_msgs::CollisionObject::ADD;
 
-    table_coll_object.primitives.push_back(primitive);
-    table_coll_object.primitive_poses.push_back(pose);
-    table_coll_object.operation = moveit_msgs::CollisionObject::ADD;
+        collision_objects.push_back(red_pill);
+        // Green table
+        moveit_msgs::CollisionObject green_pill;
+        green_pill.header.frame_id = "map";
+        green_pill.id = "green_pill";
+        shape_msgs::SolidPrimitive primitive2;
+        primitive2.type = shape_msgs::SolidPrimitive::CYLINDER;
+        primitive2.dimensions.resize(2);
+        primitive2.dimensions[0] = 0.70; // x dimension
+        primitive2.dimensions[1] = 0.22;  // y dimension
 
-    collision_objects.push_back(table_coll_object);
-    
+        geometry_msgs::Pose pose2;
+        pose2.position.x = 5.0074;
+        pose2.position.y = 1.0159;
+        pose2.position.z = 0.345;
+
+        green_pill.primitives.push_back(primitive2);
+        green_pill.primitive_poses.push_back(pose2);
+        green_pill.operation = moveit_msgs::CollisionObject::ADD;
+
+        collision_objects.push_back(green_pill);
+        // Blue table
+        moveit_msgs::CollisionObject blue_pill;
+        blue_pill.header.frame_id = "map";
+        blue_pill.id = "blue_pill";
+        shape_msgs::SolidPrimitive primitive3;
+        primitive3.type = shape_msgs::SolidPrimitive::CYLINDER;
+        primitive3.dimensions.resize(2);
+        primitive3.dimensions[0] = 0.70; // x dimension
+        primitive3.dimensions[1] = 0.22;  // y dimension
+
+        geometry_msgs::Pose pose3;
+        pose3.position.x = 6.00714;
+        pose3.position.y = 1.0159;
+        pose3.position.z = 0.345;
+
+        blue_pill.primitives.push_back(primitive3);
+        blue_pill.primitive_poses.push_back(pose3);
+        blue_pill.operation = moveit_msgs::CollisionObject::ADD;
+
+        collision_objects.push_back(blue_pill);
+        
+    }
     // Add the collision object to the planning scene
     planning_scene_interface_.applyCollisionObjects(collision_objects);
 }

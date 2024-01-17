@@ -54,7 +54,8 @@ private:
     /// @brief Add the objects to the collision objects
     /// @param objects
     /// @param ids
-    void addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::vector<int>& ids);
+    /// @param pick, true if pick, false if place
+    void addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::vector<int>& ids, bool pick);
 
     /// @brief Subroutine to pick the object using intermediate poses
     /// @param object, pose of the object to pick
