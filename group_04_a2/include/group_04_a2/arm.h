@@ -87,7 +87,4 @@ private:
     void safePose(bool tuck);
 };
 
-
-
-
 #endif // ARM_H

@@ -166,7 +166,8 @@ include_directories(
     src/camera.cpp)
 
  add_library(${PROJECT_NAME}_arm
-    src/arm.cpp)
+    src/arm.cpp 
+    src/arm_helpers.cpp)
 
  target_link_libraries(
    ${PROJECT_NAME}_client

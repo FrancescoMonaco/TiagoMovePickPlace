@@ -37,6 +37,10 @@ void feedbackCb(const group_04_a2::TiagoFeedbackConstPtr& feedback);
 /// @param linear_init if true the robot will move in the corridor
 group_04_a2::TiagoGoal createGoal(double x, double y, double z, double t1, double t2, double t3, bool linear_init=false);
 
+/// @brief Returns a map with waypoints to move around the table
+/// @return std::map<int, geometry_msgs::PoseStamped>, the key is the number of the waypoint
+std::map<int, geometry_msgs::PoseStamped> getPositionMap();
+
 //*** Camera functions declaration
 
 /// @brief Contact the camera server and return the result of the detection
