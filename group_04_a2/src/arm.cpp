@@ -96,10 +96,19 @@ void Arm::pickObj(const geometry_msgs::Pose& object, int id)
     std::vector<geometry_msgs::Pose> path_blue;
 
     tf2::Quaternion q;
+    geometry_msgs::Pose pose_0;
+    pose_0.position = object.position;
+    pose_0.position.z = pose_0.position.z - returnDimesions(id)[1] / 2 +0.35;
+    q.setRPY(0, +M_PI/2, 0);
+    pose_0.orientation.x = q.x();
+    pose_0.orientation.y = q.y();
+    pose_0.orientation.z = q.z();
+    pose_0.orientation.w = q.w();
+    path_blue.push_back(pose_0);
 
     geometry_msgs::Pose pose_1;
     pose_1.position = object.position;
-    pose_1.position.z = pose_1.position.z - returnDimesions(id)[1] / 2 +0.20;
+    pose_1.position.z = pose_1.position.z - returnDimesions(id)[1] / 2 +0.22;
     q.setRPY(0, +M_PI/2, 0);
     pose_1.orientation.x = q.x();
     pose_1.orientation.y = q.y();
@@ -107,7 +116,7 @@ void Arm::pickObj(const geometry_msgs::Pose& object, int id)
     pose_1.orientation.w = q.w();
     path_blue.push_back(pose_1); 
     
-     moveArmPath(path_blue);
+    moveArmPath(path_blue);
     
    }
    else if (id == 3){
@@ -119,7 +128,6 @@ void Arm::pickObj(const geometry_msgs::Pose& object, int id)
     geometry_msgs::Pose pose_0;
     pose_0.position = object.position;
     pose_0.position.z = pose_0.position.z - returnDimesions(id)[1] / 2 +0.35;
-    pose_0.position.y -= 0.30;
     q.setRPY(0, +M_PI/2, 0);
     pose_0.orientation.x = q.x();
     pose_0.orientation.y = q.y();
@@ -306,21 +314,24 @@ void Arm::gripper(bool open, int id)
     }
     // Create a publisher for the gripper command
     ros::Publisher gripperPub = nh_.advertise<trajectory_msgs::JointTrajectory>("/parallel_gripper_controller/command", 10);
-
-    // Create a message for the gripper command
+    ros::Duration(1.0).sleep();
+    // Create a gripper command message
     trajectory_msgs::JointTrajectory gripperMsg;
-    gripperMsg.header.stamp = ros::Time::now();
-    gripperMsg.joint_names.push_back("parallel_gripper_joint");
-    trajectory_msgs::JointTrajectoryPoint gripperPoint;
-    gripperPoint.positions.push_back(open ? 0.04 : 0.0);
-    gripperPoint.time_from_start = ros::Duration(0.5);
-    gripperMsg.points.push_back(gripperPoint);
+    gripperMsg.joint_names.push_back("gripper_left_finger_joint");
+    gripperMsg.joint_names.push_back("gripper_right_finger_joint");
+    gripperMsg.points.resize(1);
+    gripperMsg.points[0].positions.resize(2);
+    gripperMsg.points[0].positions[0] = open ? 0.5 : 0.0;
+    gripperMsg.points[0].positions[1] = open ? 0.5 : 0.0;
+    gripperMsg.points[0].time_from_start = ros::Duration(1.0);
 
     // Publish the gripper command
     gripperPub.publish(gripperMsg);
 
-    // Perform object attachment/detachment based on the gripper state
+    ros::spinOnce();
 
+    // Wait for the gripper to finish
+    ros::Duration(1.5).sleep();
 
     // Close the publisher
     gripperPub.shutdown();
