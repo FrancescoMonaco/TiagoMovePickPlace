@@ -4,6 +4,7 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Pose.h>
 #include <vector>
+#include <string>
 #include <std_msgs/Float64.h>
 #include <actionlib/server/simple_action_server.h>
 #include <group_04_a2/ArmAction.h>
@@ -55,7 +56,7 @@ private:
     /// @param objects
     /// @param ids
     /// @param pick, true if pick, false if place
-    void addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::vector<int>& ids, bool pick);
+    std::vector<std::string> addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::vector<int>& ids, bool pick);
 
     /// @brief Subroutine to pick the object using intermediate poses
     /// @param object, pose of the object to pick

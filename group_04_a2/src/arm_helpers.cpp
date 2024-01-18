@@ -72,8 +72,9 @@ void Arm::safePose(bool tuck){
     }
 }
 
-void Arm::addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::vector<int>& ids, bool pick){
+std::vector<std::string> Arm::addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::vector<int>& ids, bool pick){
     std::vector<moveit_msgs::CollisionObject> collision_objects;
+    std::vector<std::string> collision_names;
     if (pick){
 
         // Add the objects to the collision objects
@@ -82,7 +83,7 @@ void Arm::addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::ve
             moveit_msgs::CollisionObject collision_object;
             collision_object.header.frame_id = "base_footprint";
             collision_object.id = "object" + std::to_string(ids[i]);
-
+            collision_names.push_back(collision_object.id);
             // Use a box as the collision object
             shape_msgs::SolidPrimitive object_primitive;
             object_primitive.type = shape_msgs::SolidPrimitive::BOX;
@@ -111,6 +112,7 @@ void Arm::addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::ve
         moveit_msgs::CollisionObject table_coll_object;
         table_coll_object.header.frame_id = "map";
         table_coll_object.id = "table";
+        collision_names.push_back(table_coll_object.id);
         shape_msgs::SolidPrimitive primitive;
         primitive.type = shape_msgs::SolidPrimitive::BOX;
         primitive.dimensions.resize(3);
@@ -134,6 +136,7 @@ void Arm::addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::ve
        moveit_msgs::CollisionObject red_pill;
         red_pill.header.frame_id = "map";
         red_pill.id = "red_pill";
+        collision_names.push_back(red_pill.id);
         shape_msgs::SolidPrimitive primitive;
         primitive.type = shape_msgs::SolidPrimitive::CYLINDER;
         primitive.dimensions.resize(2);
@@ -154,6 +157,7 @@ void Arm::addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::ve
         moveit_msgs::CollisionObject green_pill;
         green_pill.header.frame_id = "map";
         green_pill.id = "green_pill";
+        collision_names.push_back(green_pill.id);
         shape_msgs::SolidPrimitive primitive2;
         primitive2.type = shape_msgs::SolidPrimitive::CYLINDER;
         primitive2.dimensions.resize(2);
@@ -174,6 +178,7 @@ void Arm::addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::ve
         moveit_msgs::CollisionObject blue_pill;
         blue_pill.header.frame_id = "map";
         blue_pill.id = "blue_pill";
+        collision_names.push_back(blue_pill.id);
         shape_msgs::SolidPrimitive primitive3;
         primitive3.type = shape_msgs::SolidPrimitive::CYLINDER;
         primitive3.dimensions.resize(2);
@@ -194,6 +199,7 @@ void Arm::addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::ve
     }
     // Add the collision object to the planning scene
     planning_scene_interface_.applyCollisionObjects(collision_objects);
+    return collision_names;
 }
 
 void Arm::attachObjectToGripper(int id){

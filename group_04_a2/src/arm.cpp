@@ -6,7 +6,7 @@ void Arm::pickObject(const group_04_a2::ArmGoalConstPtr &goal){
     std::vector<int> ids = goal->ids;
 
     // Add the objects to the collision objects
-    addCollisionObjects(objects, ids, true);
+    std::vector<std::string> obj_names = addCollisionObjects(objects, ids, true);
     // Move the arm to the object
     pickObj(objects[0], ids[0]);
     // Grip and attach the object
@@ -16,7 +16,7 @@ void Arm::pickObject(const group_04_a2::ArmGoalConstPtr &goal){
     safePose(true);
 
     // After placing, clear the planning scene
-    planning_scene_interface_ = moveit::planning_interface::PlanningSceneInterface();
+    planning_scene_interface_.removeCollisionObjects(obj_names);
 
     as_.setSucceeded();
 }
@@ -24,7 +24,7 @@ void Arm::pickObject(const group_04_a2::ArmGoalConstPtr &goal){
 void Arm::placeObject(const group_04_a2::ArmGoalConstPtr &goal){   
     std::vector<geometry_msgs::Pose> objects = goal->poses;
     std::vector<int> ids = goal->ids;
-    addCollisionObjects(objects, ids, false);
+    std::vector<std::string> obj_names = addCollisionObjects(objects, ids, false);
     // Move the arm to the object
     safePose(false);
 
@@ -36,7 +36,8 @@ void Arm::placeObject(const group_04_a2::ArmGoalConstPtr &goal){
     safePose(true);
 
     // After placing, clear the planning scene
-    planning_scene_interface_ = moveit::planning_interface::PlanningSceneInterface();
+    planning_scene_interface_.removeCollisionObjects(obj_names);
+
 
     as_.setSucceeded();
 }
