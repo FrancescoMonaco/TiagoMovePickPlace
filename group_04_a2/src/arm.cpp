@@ -123,7 +123,7 @@ void Arm::pickObj(const geometry_msgs::Pose& object, int id){
 
     geometry_msgs::Pose pose_1;
     pose_1.position = object.position;
-    pose_1.position.z = pose_1.position.z - returnDimesions(id)[1] / 2 +0.22;
+    pose_1.position.z = pose_1.position.z - returnDimesions(id)[1] / 2 +0.19;
     q.setRPY(0, +M_PI/2, 0);
     pose_1.orientation.x = q.x();
     pose_1.orientation.y = q.y();
