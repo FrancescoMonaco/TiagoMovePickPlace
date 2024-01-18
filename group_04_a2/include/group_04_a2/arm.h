@@ -61,7 +61,8 @@ private:
     /// @brief Subroutine to pick the object using intermediate poses
     /// @param object, pose of the object to pick
     /// @param id, id of the object to pick
-    void pickObj(const geometry_msgs::Pose& object, int id);
+    /// @return path of poses to go up from the object
+    std::vector<geometry_msgs::Pose> pickObj(const geometry_msgs::Pose& object, int id);
 
     /// @brief Given a path of poses, move the arm
     /// @param path, path of poses

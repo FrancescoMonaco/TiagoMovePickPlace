@@ -8,9 +8,14 @@ void Arm::pickObject(const group_04_a2::ArmGoalConstPtr &goal){
     // Add the objects to the collision objects
     std::vector<std::string> obj_names = addCollisionObjects(objects, ids, true);
     // Move the arm to the object
-    pickObj(objects[0], ids[0]);
+    std::vector<geometry_msgs::Pose> up_path = pickObj(objects[0], ids[0]);
+
     // Grip and attach the object
     gripper(false, ids[0]);
+
+    // Raise the object
+    up_path[0].position.z += 0.2;
+    moveArmPath(up_path);
 
     // Tuck again the arm as in the beginning
     safePose(true);
@@ -32,12 +37,13 @@ void Arm::placeObject(const group_04_a2::ArmGoalConstPtr &goal){
     // Detach the object
     //gripper(true, goal->ids[0]);
 
+    // Raise the arm
+
     // Tuck again the arm as in the beginning
     safePose(true);
 
     // After placing, clear the planning scene
     planning_scene_interface_.removeCollisionObjects(obj_names);
-
 
     as_.setSucceeded();
 }
@@ -49,8 +55,8 @@ void Arm::moveArmPath(const std::vector<geometry_msgs::Pose>& path)
     moveit::planning_interface::MoveGroupInterface move_group_interface("arm_torso");
     //const moveit::core::JointModelGroup* joint_model_group = move_group_interface.getCurrentState()->getJointModelGroup("arm_torso");
     move_group_interface.setPoseReferenceFrame("base_footprint"); //or base_footprint
-    move_group_interface.setNumPlanningAttempts(15);
-    move_group_interface.setPlanningTime(5);
+    move_group_interface.setNumPlanningAttempts(16);
+    move_group_interface.setPlanningTime(7);
 
     moveit::planning_interface::MoveGroupInterface::Plan my_plan;
 
@@ -68,7 +74,7 @@ void Arm::moveArmPath(const std::vector<geometry_msgs::Pose>& path)
             double fraction = move_group_interface.computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
             my_plan.trajectory_ = trajectory;
 
-            bool success = (fraction == 1.0);
+            bool success = (fraction >=0.7);
 
             if (success){
                 move_group_interface.execute(my_plan);
@@ -103,9 +109,10 @@ void Arm::moveArmPath(const std::vector<geometry_msgs::Pose>& path)
     return;
 }
 
-void Arm::pickObj(const geometry_msgs::Pose& object, int id){
+std::vector<geometry_msgs::Pose> Arm::pickObj(const geometry_msgs::Pose& object, int id){
     // Move to a safe pose
     safePose(false);
+    std::vector<geometry_msgs::Pose> up_path;
 
     if(id == 1){
     //BLUE EXAGON ARM POSE - OK
@@ -121,6 +128,7 @@ void Arm::pickObj(const geometry_msgs::Pose& object, int id){
     pose_0.orientation.z = q.z();
     pose_0.orientation.w = q.w();
     path_blue.push_back(pose_0);
+    up_path.push_back(pose_0);
 
     geometry_msgs::Pose pose_1;
     pose_1.position = object.position;
@@ -150,6 +158,7 @@ void Arm::pickObj(const geometry_msgs::Pose& object, int id){
     pose_0.orientation.z = q.z();
     pose_0.orientation.w = q.w();
     path_red.push_back(pose_0);
+    up_path.push_back(pose_0);
 
     geometry_msgs::Pose pose_1;
     pose_1.position = object.position;
@@ -171,27 +180,6 @@ void Arm::pickObj(const geometry_msgs::Pose& object, int id){
 
     tf2::Quaternion q;
 
-    geometry_msgs::Pose pose_0;
-    pose_0.position = object.position;
-    pose_0.position.x -= 0.25;
-    pose_0.position.y -= 0.7;
-    q.setRPY(0, +M_PI/2, +M_PI/3);
-    pose_0.orientation.x = q.x();
-    pose_0.orientation.y = q.y();
-    pose_0.orientation.z = q.z();
-    pose_0.orientation.w = q.w();
-    path_green.push_back(pose_0);
-
-    geometry_msgs::Pose pose_1;
-    pose_1.position = object.position;
-    pose_1.position.x -= 0.25;
-    q.setRPY(0, +M_PI/2, +M_PI/4);
-    pose_1.orientation.x = q.x();
-    pose_1.orientation.y = q.y();
-    pose_1.orientation.z = q.z();
-    pose_1.orientation.w = q.w();
-    path_green.push_back(pose_1);
-
     geometry_msgs::Pose pose_2;
     pose_2.position = object.position;
     pose_2.position.z += 0.30;
@@ -201,6 +189,7 @@ void Arm::pickObj(const geometry_msgs::Pose& object, int id){
     pose_2.orientation.z = q.z();
     pose_2.orientation.w = q.w();
     path_green.push_back(pose_2);
+    up_path.push_back(pose_2);
 
     geometry_msgs::Pose pose_3;
     pose_3.position = object.position;
@@ -215,7 +204,8 @@ void Arm::pickObj(const geometry_msgs::Pose& object, int id){
 
     moveArmPath(path_green);
     }
-    return;
+
+    return up_path;
 
 }
 

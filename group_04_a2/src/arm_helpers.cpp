@@ -28,7 +28,7 @@ void Arm::safePose(bool tuck){
     moveit::planning_interface::MoveGroupInterface::Plan my_plan;
 
     // Set the initial position
-    std::vector<double> initial_position = {0.140, 4 * (M_PI / 180), 45 * (M_PI / 180), -80 * (M_PI / 180), 33 * (M_PI / 180), -90 * (M_PI / 180), 78 * (M_PI / 180), 0};
+    std::vector<double> initial_position = {0.300, 4 * (M_PI / 180), 45 * (M_PI / 180), -80 * (M_PI / 180), 33 * (M_PI / 180), -90 * (M_PI / 180), 78 * (M_PI / 180), 0};
     move_group_interface.setJointValueTarget(initial_position);
 
     bool success = (move_group_interface.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
@@ -55,7 +55,7 @@ void Arm::safePose(bool tuck){
         moveit::planning_interface::MoveGroupInterface::Plan my_plan;
 
         // Set the initial position
-        std::vector<double> initial_position = {0.185, 11 * (M_PI / 180), -84 * (M_PI / 180), -20 * (M_PI / 180), 103 * (M_PI / 180), -90 * (M_PI / 180), 80 * (M_PI / 180), 0};
+        std::vector<double> initial_position = {0.195, 11 * (M_PI / 180), -84 * (M_PI / 180), -20 * (M_PI / 180), 103 * (M_PI / 180), -90 * (M_PI / 180), 80 * (M_PI / 180), 0};
 
         move_group_interface.setJointValueTarget(initial_position);
 
@@ -116,8 +116,8 @@ std::vector<std::string> Arm::addCollisionObjects(std::vector<geometry_msgs::Pos
         shape_msgs::SolidPrimitive primitive;
         primitive.type = shape_msgs::SolidPrimitive::BOX;
         primitive.dimensions.resize(3);
-        primitive.dimensions[0] = 0.934400; // x dimension
-        primitive.dimensions[1] = 0.934400;  // y dimension
+        primitive.dimensions[0] = 0.944400; // x dimension
+        primitive.dimensions[1] = 0.944400;  // y dimension
         primitive.dimensions[2] = 0.774700;  // z dimension
 
         geometry_msgs::Pose pose;

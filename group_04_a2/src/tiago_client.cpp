@@ -6,6 +6,7 @@ geometry_msgs::PoseStamped pose_1;
 geometry_msgs::PoseStamped pose_2;
 geometry_msgs::PoseStamped pose_3;
 geometry_msgs::PoseStamped waypoint_1;
+geometry_msgs::PoseStamped waypoint_2;
 geometry_msgs::PoseStamped waypoint_place;
 
 
@@ -34,7 +35,8 @@ int main(int argc, char **argv)
     InitializePoses();
     
     // Go to the first object
-    move_to(pose_1, ac);
+    move_to(waypoint_2, ac);
+    move_to(pose_3, ac);
     
     // Get the camera results
     group_04_a2::CameraResultConstPtr camera_pointer = cameraDetection();
@@ -115,6 +117,16 @@ void InitializePoses(){
     waypoint_1.pose.orientation.y = 0;
     waypoint_1.pose.orientation.z = -0.702;
     waypoint_1.pose.orientation.w = 0.7124;
+
+    // Waypoint 2
+    waypoint_2.header.stamp = ros::Time::now();
+    waypoint_2.header.frame_id = "";
+    waypoint_2.pose.position.x = 9.35;
+    waypoint_2.pose.position.y = -4.22;
+    waypoint_2.pose.position.z = 0;
+    waypoint_2.pose.orientation.x = 0;
+    waypoint_2.pose.orientation.y = 0;
+    waypoint_2.pose.orientation.z = -0.702;
 
     // Waypoint Place
     waypoint_place.header.stamp = ros::Time::now();

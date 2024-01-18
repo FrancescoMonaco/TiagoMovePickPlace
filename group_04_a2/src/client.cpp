@@ -177,7 +177,6 @@ group_04_a2::CameraResultConstPtr cameraDetection(bool color_recognition){
     pose_1.pose.orientation.x = 0;
     pose_1.pose.orientation.y = 0;
     pose_1.pose.orientation.z = -1.5;
-    pose_1.pose.orientation.w = 0.896;
 
     geometry_msgs::PoseStamped pose_2;
         // Table pose 2
@@ -189,7 +188,6 @@ group_04_a2::CameraResultConstPtr cameraDetection(bool color_recognition){
     pose_2.pose.orientation.x = 0;
     pose_2.pose.orientation.y = 0;
     pose_2.pose.orientation.z = -1.5;
-    pose_2.pose.orientation.w = 0.896;
 
     geometry_msgs::PoseStamped pose_3;
         // Pose 3
@@ -201,7 +199,6 @@ group_04_a2::CameraResultConstPtr cameraDetection(bool color_recognition){
     pose_3.pose.orientation.x = 0;
     pose_3.pose.orientation.y = 0;
     pose_3.pose.orientation.z = 1.5;
-    pose_3.pose.orientation.w = 0.669;
 
     geometry_msgs::PoseStamped waypoint_1;
         // Waypoint 1
@@ -213,9 +210,16 @@ group_04_a2::CameraResultConstPtr cameraDetection(bool color_recognition){
     waypoint_1.pose.orientation.x = 0;
     waypoint_1.pose.orientation.y = 0;
     waypoint_1.pose.orientation.z = -0.702;
-    waypoint_1.pose.orientation.w = 0.7124;
 
     geometry_msgs::PoseStamped waypoint_2;
+        // Waypoint 2
+    waypoint_2.header.stamp = ros::Time::now();
+    waypoint_2.header.frame_id = "";
+    waypoint_2.pose.position.x = 9.35;
+    waypoint_2.pose.position.y = -4.22;
+    waypoint_2.pose.position.z = 0;
+    waypoint_2.pose.orientation.x = 0;
+    waypoint_2.pose.orientation.y = 0;
 
     geometry_msgs::PoseStamped waypoint_place;
         // Waypoint Place
