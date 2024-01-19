@@ -61,7 +61,7 @@ void Arm::placeObject(const group_04_a2::ArmGoalConstPtr &goal){
     gripper(true, goal->ids[0]);
 
     // Raise the arm
-    std::vector<double> up_pos = {0.180, 47 * (M_PI / 180), 53 * (M_PI / 180), -25 * (M_PI / 180), 67 * (M_PI / 180), -103 * (M_PI / 180), 80 * (M_PI / 180), 0};
+    std::vector<double> up_pos = {0.180, 66 * (M_PI / 180), 47 * (M_PI / 180), -25 * (M_PI / 180), 67 * (M_PI / 180), -102 * (M_PI / 180), 80 * (M_PI / 180), 0};
     move_group_interface.setJointValueTarget(up_pos);
 
     success = (move_group_interface.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
