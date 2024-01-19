@@ -140,8 +140,8 @@ std::vector<std::string> Arm::addCollisionObjects(std::vector<geometry_msgs::Pos
         shape_msgs::SolidPrimitive primitive;
         primitive.type = shape_msgs::SolidPrimitive::CYLINDER;
         primitive.dimensions.resize(2);
-        primitive.dimensions[0] = 0.70; // height
-        primitive.dimensions[1] = 0.22;  // radius
+        primitive.dimensions[0] = 0.72; // height
+        primitive.dimensions[1] = 0.23;  // radius
 
         geometry_msgs::Pose pose;
         pose.position.x = 4.0073+6.55;
@@ -161,8 +161,8 @@ std::vector<std::string> Arm::addCollisionObjects(std::vector<geometry_msgs::Pos
         shape_msgs::SolidPrimitive primitive2;
         primitive2.type = shape_msgs::SolidPrimitive::CYLINDER;
         primitive2.dimensions.resize(2);
-        primitive2.dimensions[0] = 0.70; // x dimension
-        primitive2.dimensions[1] = 0.22;  // y dimension
+        primitive2.dimensions[0] = 0.72; // height
+        primitive2.dimensions[1] = 0.23;  // radius
 
         geometry_msgs::Pose pose2;
         pose2.position.x = 5.0074+6.55;
@@ -182,8 +182,8 @@ std::vector<std::string> Arm::addCollisionObjects(std::vector<geometry_msgs::Pos
         shape_msgs::SolidPrimitive primitive3;
         primitive3.type = shape_msgs::SolidPrimitive::CYLINDER;
         primitive3.dimensions.resize(2);
-        primitive3.dimensions[0] = 0.70; // x dimension
-        primitive3.dimensions[1] = 0.22;  // y dimension
+        primitive3.dimensions[0] = 0.72; // height
+        primitive3.dimensions[1] = 0.23;  // radius
 
         geometry_msgs::Pose pose3;
         pose3.position.x = 6.00714+6.55;

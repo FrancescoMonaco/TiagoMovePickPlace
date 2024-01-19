@@ -41,8 +41,8 @@ void Arm::placeObject(const group_04_a2::ArmGoalConstPtr &goal){
 
     moveit::planning_interface::MoveGroupInterface::Plan my_plan;
 
-    // Set the initial position
-    std::vector<double> initial_position = {0.126, 47 * (M_PI / 180), 53 * (M_PI / 180), -25 * (M_PI / 180), 67 * (M_PI / 180), -103 * (M_PI / 180), 80 * (M_PI / 180), 0};
+    // Set the position
+    std::vector<double> initial_position = {0.144, 66 * (M_PI / 180), 47 * (M_PI / 180), -25 * (M_PI / 180), 67 * (M_PI / 180), -102 * (M_PI / 180), 80 * (M_PI / 180), 0};
     move_group_interface.setJointValueTarget(initial_position);
 
     bool success = (move_group_interface.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);

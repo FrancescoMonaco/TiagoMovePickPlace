@@ -50,6 +50,12 @@ group_04_a2::TiagoResultConstPtr move_to(geometry_msgs::PoseStamped pose_1, acti
 /// @return std::map<int, geometry_msgs::PoseStamped>, the key is the number of the waypoint
 std::map<int, geometry_msgs::PoseStamped> getPositionMap();
 
+/// @brief Returns the path to reach the barrel
+/// @param barrel_wrt_robot pose of the barrel wrt the robot
+/// @param wp current pose of the robot
+/// @param direction retrieved from the camera, 0 is left, 1 is straight, 2 is right
+std::vector<geometry_msgs::PoseStamped> computeBarrelPose(geometry_msgs::PoseStamped barrel_wrt_robot, geometry_msgs::PoseStamped wp, int direction);
+
 //*** Camera functions declaration
 
 /// @brief Contact the camera server and return the result of the detection
