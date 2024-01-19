@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0.2)
 project(group_04_a2)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
- add_compile_options(-std=c++11)
+add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -184,10 +184,10 @@ include_directories(
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
- add_dependencies(${PROJECT_NAME}_client ${PROJECT_NAME}_generate_messages_cpp)
- add_dependencies(${PROJECT_NAME}_server ${PROJECT_NAME}_generate_messages_cpp)
- #add_dependencies(${PROJECT_NAME}_camera ${PROJECT_NAME}_generate_messages_cpp)
-
+add_dependencies(${PROJECT_NAME}_client ${PROJECT_NAME}_generate_messages_cpp)
+add_dependencies(${PROJECT_NAME}_server ${PROJECT_NAME}_generate_messages_cpp)
+add_dependencies(${PROJECT_NAME}_camera ${PROJECT_NAME}_generate_messages_cpp)
+add_dependencies(${PROJECT_NAME}_arm ${PROJECT_NAME}_generate_messages_cpp)
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
@@ -260,9 +260,11 @@ add_executable(tiago_arm src/tiago_arm.cpp)
 add_dependencies(tiago_client group_04_a2_generate_messages_cpp)
 add_dependencies(tiago_server group_04_a2_generate_messages_cpp)
 add_dependencies(tiago_motion group_04_a2_generate_messages_cpp)
-#add_dependencies(tiago_camera group_04_a2_generate_messages_cpp)
+add_dependencies(tiago_camera group_04_a2_generate_messages_cpp)
+add_dependencies(tiago_arm group_04_a2_generate_messages_cpp)
 
-target_link_libraries(tiago_client ${catkin_LIBRARIES} ${PROJECT_NAME}_client ${PROJECT_NAME}_human_client ${PROJECT_NAME}_arm)
+
+target_link_libraries(tiago_client ${catkin_LIBRARIES} ${PROJECT_NAME}_client ${PROJECT_NAME}_human_client ${PROJECT_NAME}_arm ${PROJECT_NAME}_camera)
 target_link_libraries(tiago_server ${catkin_LIBRARIES} ${PROJECT_NAME}_server ${PROJECT_NAME}_objfind ${PROJECT_NAME}_motion)
 target_link_libraries(tiago_motion ${catkin_LIBRARIES})
 target_link_libraries(tiago_camera ${catkin_LIBRARIES} ${PROJECT_NAME}_camera)

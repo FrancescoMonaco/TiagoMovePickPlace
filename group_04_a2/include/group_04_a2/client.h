@@ -32,11 +32,12 @@ void feedbackCb(const group_04_a2::TiagoFeedbackConstPtr& feedback);
 /// @param x x coordinate of the goal
 /// @param y y coordinate of the goal
 /// @param z z coordinate of the goal
-/// @param t1 roll of the goal
-/// @param t2 pitch of the goal
-/// @param t3 yaw of the goal
+/// @param ox first quaternion of the goal
+/// @param oy second quaternion of the goal
+/// @param oz third quaternion of the goal
+/// @param ow fourth quaternion of the goal
 /// @param linear_init if true the robot will move in the corridor
-group_04_a2::TiagoGoal createGoal(double x, double y, double z, double t1, double t2, double t3, bool linear_init=false);
+group_04_a2::TiagoGoal createGoal(double px, double py, double pz, double ox, double oy, double oz, double ow, bool linear_init=false);
 
 /// @brief Function that moves the robot to a goal
 /// @param pose_1 goal pose

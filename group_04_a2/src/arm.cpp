@@ -33,12 +33,47 @@ void Arm::placeObject(const group_04_a2::ArmGoalConstPtr &goal){
     // Move the arm to the object
     safePose(false);
 
+    // Place the object
+    moveit::planning_interface::MoveGroupInterface move_group_interface("arm_torso");
+    const moveit::core::JointModelGroup* joint_model_group = move_group_interface.getCurrentState()->getJointModelGroup("arm_torso");
+    move_group_interface.setNumPlanningAttempts(15);
+    move_group_interface.setPlanningTime(5);
+
+    moveit::planning_interface::MoveGroupInterface::Plan my_plan;
+
+    // Set the initial position
+    std::vector<double> initial_position = {0.126, 47 * (M_PI / 180), 53 * (M_PI / 180), -25 * (M_PI / 180), 67 * (M_PI / 180), -103 * (M_PI / 180), 80 * (M_PI / 180), 0};
+    move_group_interface.setJointValueTarget(initial_position);
+
+    bool success = (move_group_interface.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+
+    if (success){
+        move_group_interface.execute(my_plan);
+        ROS_INFO("Initial position done");
+    }
+    else{
+        ROS_ERROR("FAILED TO PLAN INITIAL POSITION --- ABORT");
+        return;
+    }
+    
 
     // Detach the object
-    //gripper(true, goal->ids[0]);
+    gripper(true, goal->ids[0]);
 
     // Raise the arm
+    std::vector<double> up_pos = {0.180, 47 * (M_PI / 180), 53 * (M_PI / 180), -25 * (M_PI / 180), 67 * (M_PI / 180), -103 * (M_PI / 180), 80 * (M_PI / 180), 0};
+    move_group_interface.setJointValueTarget(up_pos);
 
+    success = (move_group_interface.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+
+    if (success){
+        move_group_interface.execute(my_plan);
+        ROS_INFO("Up position done");
+    }
+    else{
+        ROS_ERROR("FAILED TO PLAN UP POSITION --- ABORT");
+        return;
+    }
     // Tuck again the arm as in the beginning
     safePose(true);
 

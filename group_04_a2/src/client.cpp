@@ -82,31 +82,29 @@ void arm_feedbackCb(const group_04_a2::ArmFeedbackConstPtr& feedback)
 }
 
 //*** Other functions
-group_04_a2::TiagoGoal createGoal(double x, double y, double z, double t1, double t2, double t3, bool linear_init)
+group_04_a2::TiagoGoal createGoal(double px, double py, double pz, double ox, double oy, double oz, double ow, bool linear_init)
 {   
-    // Check if the goal is valid
+   /*// Check if the goal is valid
     if(z != 0 || t1 != 0 || t2 != 0)
     {
         // Print an error message
         ROS_INFO("The goal is not valid, the robot can only move in the x-y plane");
         // Shutdown the node
         ros::shutdown();
-    }
+    }*/
 
     // Check if the goal is in the map (TO DO)
 
     group_04_a2::TiagoGoal goal;
     // use geometry_msgs::PoseStamped to set the goal pose
     goal.goal_pose.header.frame_id = "map";
-    goal.goal_pose.pose.position.x = x;
-    goal.goal_pose.pose.position.y = y;
-    goal.goal_pose.pose.position.z = z;
-    tf2::Quaternion q;
-    q.setRPY(t1, t2, t3);
-    goal.goal_pose.pose.orientation.x = q.x();
-    goal.goal_pose.pose.orientation.y = q.y();
-    goal.goal_pose.pose.orientation.z = q.z();
-    goal.goal_pose.pose.orientation.w = q.w();
+    goal.goal_pose.pose.position.x = px;
+    goal.goal_pose.pose.position.y = py;
+    goal.goal_pose.pose.position.z = pz;
+    goal.goal_pose.pose.orientation.x = ox;
+    goal.goal_pose.pose.orientation.y = oy;
+    goal.goal_pose.pose.orientation.z = oz;
+    goal.goal_pose.pose.orientation.w = ow;
     goal.linear_init = linear_init;
     // set the header of the goal
     goal.goal_pose.header.stamp = ros::Time::now();
@@ -138,7 +136,7 @@ group_04_a2::CameraResultConstPtr cameraDetection(bool color_recognition){
 
     group_04_a2::TiagoGoal goal = createGoal(pose_1.pose.position.x, pose_1.pose.position.y, pose_1.pose.position.z, 
                                                 pose_1.pose.orientation.x, pose_1.pose.orientation.y, 
-                                                pose_1.pose.orientation.z, corridor);
+                                                pose_1.pose.orientation.z, pose_1.pose.orientation.w, corridor);
     ac.sendGoal(goal, &doneCb, &activeCb, &feedbackCb);
     // Wait for the robot to reach the position
     ac.waitForResult();
