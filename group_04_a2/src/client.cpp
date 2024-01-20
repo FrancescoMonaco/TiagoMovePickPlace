@@ -82,6 +82,18 @@ void arm_feedbackCb(const group_04_a2::ArmFeedbackConstPtr& feedback)
 }
 
 //*** Other functions
+/**
+ * Creates the TiagoGoal objects for robot motion
+ * 
+ * @param px pose x
+ * @param py pose y
+ * @param pz pose z
+ * @param ox orientation x
+ * @param oy orientation y
+ * @param oz orientation z
+ * @param ow orientation w
+ * @param linear_init for linear movement, when Tiago spawn, in the start of the simulation
+ */
 group_04_a2::TiagoGoal createGoal(double px, double py, double pz, double ox, double oy, double oz, double ow, bool linear_init)
 {   
    /*// Check if the goal is valid
@@ -164,6 +176,14 @@ group_04_a2::CameraResultConstPtr cameraDetection(bool color_recognition){
     return result;
  }
 
+
+/**
+ * Returns the motion path which Tiago has to perform to reach the specific barrel, to place the object
+ * 
+ * @param barrel_wrt_robot position of the barrel for which we have to reach it.
+ * @param wp waypoint_place: position of Tiago, in front of the barrels
+ * @param direction {0,1,2} 0 => DIAGONAL LEFT, 1 => STRAIGHT MOTION, 2 => DIAGONAL RIGHT
+ */
 std::vector<geometry_msgs::PoseStamped> computeBarrelPose(geometry_msgs::PoseStamped barrel_wrt_robot, geometry_msgs::PoseStamped wp, int direction)
 {
     std::vector<geometry_msgs::PoseStamped> path;
@@ -242,6 +262,12 @@ std::vector<geometry_msgs::PoseStamped> computeBarrelPose(geometry_msgs::PoseSta
     return path;
 }
 
+
+/**
+ * Returns all map poses the robot has to reach during simulation
+ * 
+ * @return all map poses the robot has to reach during simulation
+ */
  std::map<int, geometry_msgs::PoseStamped> getPositionMap(){
     tf2::Quaternion q_minus_pihalf; 
     q_minus_pihalf.setRPY(0,0,-M_PI_2);
