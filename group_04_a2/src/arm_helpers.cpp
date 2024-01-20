@@ -1,5 +1,11 @@
 #include <group_04_a2/arm.h>
 
+/**
+ * Return the dimensions of each collision object, based on the id
+ * 
+ * @param id id of the collision object to return its dimensions
+ * @return Dimensions of the collision object.
+ */
 std::vector<double> Arm::returnDimesions(int id){
     //if object is BLUE
     if(id == 1) { return std::vector<double> {0.050301,0.054000,0.1}; }
@@ -72,6 +78,15 @@ void Arm::safePose(bool tuck){
     }
 }
 
+
+/**
+ * Adds into the planning scene the collision objects, saving their names
+ * 
+ * @param objects poses of the detected apriltags
+ * @param ids ids of the detected apriltags
+ * @param pick "Do we are in a picking session?"
+ * @return collsion objects' names
+ */
 std::vector<std::string> Arm::addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::vector<int>& ids, bool pick){
     std::vector<moveit_msgs::CollisionObject> collision_objects;
     std::vector<std::string> collision_names;
