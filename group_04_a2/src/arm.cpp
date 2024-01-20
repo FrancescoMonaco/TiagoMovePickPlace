@@ -1,5 +1,10 @@
 #include <group_04_a2/arm.h>
 
+/**
+ * Starts the picking session. 
+ * 
+ * @param goal ids and objects of the scene. Only one of it will be picked
+ */
 void Arm::pickObject(const group_04_a2::ArmGoalConstPtr &goal){
     //Pick the vector of objects and ids
     std::vector<geometry_msgs::Pose> objects = goal->poses;
@@ -26,6 +31,11 @@ void Arm::pickObject(const group_04_a2::ArmGoalConstPtr &goal){
     as_.setSucceeded();
 }
 
+/**
+ * Starts the placing session. 
+ * 
+ * @param goal ids and objects of the scene. Only one of it will be placed
+ */
 void Arm::placeObject(const group_04_a2::ArmGoalConstPtr &goal){   
     std::vector<geometry_msgs::Pose> objects = goal->poses;
     std::vector<int> ids = goal->ids;
@@ -83,6 +93,11 @@ void Arm::placeObject(const group_04_a2::ArmGoalConstPtr &goal){
     as_.setSucceeded();
 }
 
+/**
+ * Plans and executes the path given in input
+ * 
+ * @param path path of the motions Tiago robot has to do to reach the target position
+ */
 void Arm::moveArmPath(const std::vector<geometry_msgs::Pose>& path)
 {
     ROS_INFO("-----STARTING PATH------");
@@ -144,6 +159,13 @@ void Arm::moveArmPath(const std::vector<geometry_msgs::Pose>& path)
     return;
 }
 
+/**
+ * For each object to pick (BLUE hexagon prism, GREEN pyramid, RED cube), this function returns the path
+ * of motions Tiago has to do in order to reach the object iself
+ * 
+ * @param object pose of the object Tiago has to pick
+ * @param id id (and so, color) of the object Tiago has to pick
+ */
 std::vector<geometry_msgs::Pose> Arm::pickObj(const geometry_msgs::Pose& object, int id){
     // Move to a safe pose
     safePose(false);
