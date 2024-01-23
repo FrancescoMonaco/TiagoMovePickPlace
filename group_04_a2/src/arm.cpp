@@ -39,51 +39,26 @@ void Arm::pickObject(const group_04_a2::ArmGoalConstPtr &goal){
 void Arm::placeObject(const group_04_a2::ArmGoalConstPtr &goal){   
     std::vector<geometry_msgs::Pose> objects = goal->poses;
     std::vector<int> ids = goal->ids;
+
+    // Add the objects to the collision objects
     std::vector<std::string> obj_names = addCollisionObjects(objects, ids, false);
-    // Move the arm to the object
+
+    // Move the arm to the safe pose
     safePose(false);
 
     // Place the object
-    moveit::planning_interface::MoveGroupInterface move_group_interface("arm_torso");
-    const moveit::core::JointModelGroup* joint_model_group = move_group_interface.getCurrentState()->getJointModelGroup("arm_torso");
-    move_group_interface.setNumPlanningAttempts(15);
-    move_group_interface.setPlanningTime(5);
-
-    moveit::planning_interface::MoveGroupInterface::Plan my_plan;
-
-    // Set the position
-    std::vector<double> initial_position = {0.144, 66 * (M_PI / 180), 47 * (M_PI / 180), -25 * (M_PI / 180), 67 * (M_PI / 180), -102 * (M_PI / 180), 80 * (M_PI / 180), 0};
-    move_group_interface.setJointValueTarget(initial_position);
-
-    bool success = (move_group_interface.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
-
-    if (success){
-        move_group_interface.execute(my_plan);
-        ROS_INFO("Initial position done");
-    }
-    else{
-        ROS_ERROR("FAILED TO PLAN INITIAL POSITION --- ABORT");
-        return;
-    }
-    
+    std::vector<geometry_msgs::Pose> up_path = placeObj(objects[0], ids[0]);
 
     // Detach the object
     gripper(true, goal->ids[0]);
 
     // Raise the arm
-    std::vector<double> up_pos = {0.180, 66 * (M_PI / 180), 47 * (M_PI / 180), -25 * (M_PI / 180), 67 * (M_PI / 180), -102 * (M_PI / 180), 80 * (M_PI / 180), 0};
-    move_group_interface.setJointValueTarget(up_pos);
+    up_path[0].position.z += 0.2;
+    moveArmPath(up_path);
 
-    success = (move_group_interface.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
+    // Adjust the object now that it is on the table
+    addCollisionObjects(objects, ids, false, true);
 
-    if (success){
-        move_group_interface.execute(my_plan);
-        ROS_INFO("Up position done");
-    }
-    else{
-        ROS_ERROR("FAILED TO PLAN UP POSITION --- ABORT");
-        return;
-    }
     // Tuck again the arm as in the beginning
     safePose(true);
 
@@ -92,6 +67,41 @@ void Arm::placeObject(const group_04_a2::ArmGoalConstPtr &goal){
 
     as_.setSucceeded();
 }
+
+std::vector<geometry_msgs::Pose> Arm::placeObj(const geometry_msgs::Pose& object, int id){
+    // Angle to place the object
+    tf2::Quaternion q; q.setRPY(0, +M_PI/2, 0);
+
+    geometry_msgs::Pose pose_0;
+    pose_0.position = object.position;
+    pose_0.position.x += 0.16;
+    pose_0.position.y += 0.05;
+    pose_0.orientation.x = q.x();
+    pose_0.orientation.y = q.y();
+    pose_0.orientation.z = q.z();
+    pose_0.orientation.w = q.w();
+    pose_0.position.z += 1.2;
+
+    std::vector<geometry_msgs::Pose> waypoints;
+    std::vector<geometry_msgs::Pose> up_path;
+    up_path.push_back(pose_0);
+    waypoints.push_back(pose_0);
+
+    geometry_msgs::Pose pose_1;
+    pose_1.position = object.position;
+    pose_1.position.x += 0.16;
+    pose_1.position.y += 0.05;
+    pose_1.orientation.x = q.x();
+    pose_1.orientation.y = q.y();
+    pose_1.orientation.z = q.z();
+    pose_1.orientation.w = q.w();
+    pose_1.position.z += 1.05;
+    waypoints.push_back(pose_1);
+    moveArmPath(waypoints);
+
+    return up_path;
+}   
+
 
 /**
  * Plans and executes the path given in input
@@ -186,6 +196,7 @@ std::vector<geometry_msgs::Pose> Arm::pickObj(const geometry_msgs::Pose& object,
     pose_0.orientation.w = q.w();
     path_blue.push_back(pose_0);
     up_path.push_back(pose_0);
+    ROS_INFO("WAYPOINT 1: (%f, %f, %f)", pose_0.position.x, pose_0.position.y, pose_0.position.z);
 
     geometry_msgs::Pose pose_1;
     pose_1.position = object.position;
@@ -230,8 +241,7 @@ std::vector<geometry_msgs::Pose> Arm::pickObj(const geometry_msgs::Pose& object,
     moveArmPath(path_red);
    }
     else {
-
-    //GREEN PYRAMID ARM POSES - THEY SEEMS OK
+    //GREEN PYRAMID ARM POSES
 
     std::vector<geometry_msgs::Pose> path_green;
 

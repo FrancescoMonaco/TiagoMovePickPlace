@@ -14,6 +14,9 @@
 #include <trajectory_msgs/JointTrajectoryPoint.h>
 #include <std_srvs/Empty.h>
 #include <gazebo_ros_link_attacher/Attach.h>
+#include <tf2_ros/transform_listener.h>
+#include <tf2_ros/buffer.h>
+#include <geometry_msgs/PointStamped.h>
 
 class Arm
 {
@@ -56,13 +59,20 @@ private:
     /// @param objects
     /// @param ids
     /// @param pick, true if pick, false if place
-    std::vector<std::string> addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::vector<int>& ids, bool pick);
+    /// @param adjust, true if we need to adjust the object
+    std::vector<std::string> addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::vector<int>& ids, bool pick, bool adjust=false);
 
     /// @brief Subroutine to pick the object using intermediate poses
     /// @param object, pose of the object to pick
     /// @param id, id of the object to pick
     /// @return path of poses to go up from the object
     std::vector<geometry_msgs::Pose> pickObj(const geometry_msgs::Pose& object, int id);
+
+    /// @brief Subroutine to place the object using intermediate poses
+    /// @param object, pose of the object to place
+    /// @param id, id of the object to place
+    /// @return path of poses to go up from the object
+    std::vector<geometry_msgs::Pose> placeObj(const geometry_msgs::Pose& object, int id);
 
     /// @brief Given a path of poses, move the arm
     /// @param path, path of poses

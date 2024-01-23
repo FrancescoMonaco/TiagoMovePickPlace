@@ -10,7 +10,7 @@ void Camera::goalCB(const group_04_a2::CameraGoalConstPtr &goal){
     if(goal->color_recognition){
         setHeadPosition(0.15, -0.52);
         ros::Time start = ros::Time::now();
-        while(ros::Time::now() - start < ros::Duration(1.5)){
+        while(ros::Time::now() - start < ros::Duration(2.0)){
             ros::spinOnce();
         }
         result_.ids = colorGoalCB(goal);

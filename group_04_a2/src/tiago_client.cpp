@@ -1,4 +1,5 @@
 #include <group_04_a2/client.h>
+#include <math.h>
 
 //*** Main
 int main(int argc, char **argv)
@@ -50,7 +51,6 @@ int main(int argc, char **argv)
             // Go to the nearest waypoint
             if(ix == 5) move_to(position_map[4], ac);
             else {  move_to(position_map[3], ac);
-                    move_to(position_map[4], ac);
                     break;}
         }
             // Go to waypoint place
@@ -64,22 +64,42 @@ int main(int argc, char **argv)
 
             // Activate the camera to detect the color of the objects and choose the right place
             group_04_a2::CameraResultConstPtr camera_res = cameraDetection(true);
-
+            group_04_a2::TiagoResultConstPtr barrel_pose_place;
             // Fuse the informations together to find the right place
-            for(int i = 0; i < camera_res->ids.size(); i++){
+            int i = 0;
+            for(i = 0; i < camera_res->ids.size(); i++){
                 if (camera_res->ids[i] == actual_color) 
                 {
                     ROS_INFO("putting object to DIRECTION %d", camera_res->ids[i]);
                     ROS_INFO("BARREL TO GO at position (%f, %f, %f)", barrel_poses[i].pose.position.x, barrel_poses[i].pose.position.y, barrel_poses[i].pose.position.z);
                     std::vector<geometry_msgs::PoseStamped> pathBarrel = computeBarrelPose(barrel_poses[i], position_map[6], i);
                     for(int j=0; j<pathBarrel.size(); j++)
-                        move_to(pathBarrel[j], ac);
+                        barrel_pose_place = move_to(pathBarrel[j], ac);
                     break;
                 }
             }
 
+            // Extract the pose of the closest barrel
+            geometry_msgs::Pose barrel_pose;
+            for (int j = 0; j < barrel_pose_place.get()->result_points.size(); j++)
+            {
+                if (j==0) barrel_pose = barrel_pose_place.get()->result_points[j].pose;
+                else if (fabs(barrel_pose_place.get()->result_points[j].pose.position.y) < fabs(barrel_pose.position.y))
+                    barrel_pose = barrel_pose_place.get()->result_points[j].pose;
+               
+            }
+
+            //Print the pose of the barrel
+            ROS_INFO("Place position (%f, %f, %f)", barrel_pose.position.x, barrel_pose.position.y, barrel_pose.position.z);
+
+            // Set the pose for the place
+            std::vector<geometry_msgs::Pose> barrel_pose_vector;
+            barrel_pose_vector.push_back(barrel_pose);
+
+            std::vector<int> barrel_id;
+            barrel_id.push_back(actual_color);
             //Place the object
-            pick_place(camera_pointer->poses, camera_pointer->ids, false);
+            pick_place(barrel_pose_vector, barrel_id, false);
 
             // Return home
             move_to(position_map[4], ac);

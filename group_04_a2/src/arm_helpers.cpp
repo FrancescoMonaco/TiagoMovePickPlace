@@ -84,10 +84,10 @@ void Arm::safePose(bool tuck){
  * 
  * @param objects poses of the detected apriltags
  * @param ids ids of the detected apriltags
- * @param pick "Do we are in a picking session?"
- * @return collsion objects' names
+ * @param pick "Are we in a picking session?"
+ * @return collision objects' names
  */
-std::vector<std::string> Arm::addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::vector<int>& ids, bool pick){
+std::vector<std::string> Arm::addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::vector<int>& ids, bool pick, bool adjust){
     std::vector<moveit_msgs::CollisionObject> collision_objects;
     std::vector<std::string> collision_names;
     if (pick){
@@ -156,7 +156,8 @@ std::vector<std::string> Arm::addCollisionObjects(std::vector<geometry_msgs::Pos
         primitive.type = shape_msgs::SolidPrimitive::CYLINDER;
         primitive.dimensions.resize(2);
         primitive.dimensions[0] = 0.72; // height
-        primitive.dimensions[1] = 0.23;  // radius
+        primitive.dimensions[1] = 0.235;  // radius
+        if(adjust) primitive.dimensions[0] = 0.72+0.2; // height
 
         geometry_msgs::Pose pose;
         pose.position.x = 4.0073+6.55;
@@ -177,7 +178,8 @@ std::vector<std::string> Arm::addCollisionObjects(std::vector<geometry_msgs::Pos
         primitive2.type = shape_msgs::SolidPrimitive::CYLINDER;
         primitive2.dimensions.resize(2);
         primitive2.dimensions[0] = 0.72; // height
-        primitive2.dimensions[1] = 0.23;  // radius
+        primitive2.dimensions[1] = 0.235;  // radius
+        if (adjust) primitive2.dimensions[0] = 0.72+0.2; // height
 
         geometry_msgs::Pose pose2;
         pose2.position.x = 5.0074+6.55;
@@ -198,7 +200,8 @@ std::vector<std::string> Arm::addCollisionObjects(std::vector<geometry_msgs::Pos
         primitive3.type = shape_msgs::SolidPrimitive::CYLINDER;
         primitive3.dimensions.resize(2);
         primitive3.dimensions[0] = 0.72; // height
-        primitive3.dimensions[1] = 0.23;  // radius
+        primitive3.dimensions[1] = 0.235;  // radius
+        if (adjust) primitive3.dimensions[0] = 0.72+0.2; // height
 
         geometry_msgs::Pose pose3;
         pose3.position.x = 6.00714+6.55;
