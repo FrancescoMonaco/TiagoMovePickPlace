@@ -157,7 +157,6 @@ void Arm::moveArmPath(const std::vector<geometry_msgs::Pose>& path)
             if (success){
                 // move_group_interface.setStartStateToCurrentState() 
                 move_group_interface.execute(my_plan); //
-                ROS_INFO("ONE STEP DONE");
             }
             else{
                 ROS_ERROR("FAILED TO PLAN NEXT MOVE --- ABORT");
@@ -198,7 +197,7 @@ std::vector<geometry_msgs::Pose> Arm::pickObj(const geometry_msgs::Pose& object,
     pose_0.orientation.w = q.w();
     path_blue.push_back(pose_0);
     up_path.push_back(pose_0);
-    ROS_INFO("WAYPOINT 1: (%f, %f, %f)", pose_0.position.x, pose_0.position.y, pose_0.position.z);
+    //ROS_INFO("WAYPOINT 1: (%f, %f, %f)", pose_0.position.x, pose_0.position.y, pose_0.position.z);
 
     geometry_msgs::Pose pose_1;
     pose_1.position = object.position;
