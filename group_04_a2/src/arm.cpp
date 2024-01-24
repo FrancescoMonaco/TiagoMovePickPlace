@@ -124,7 +124,7 @@ void Arm::moveArmPath(const std::vector<geometry_msgs::Pose>& path)
 
     for(int i=0; i<path.size(); i++){
         // If its the last pose, do a cartesian path
-        if(i == path.size()-1){
+       /* if(i == path.size()-1){
             geometry_msgs::Pose current_pose = move_group_interface.getCurrentPose().pose;
             std::vector<geometry_msgs::Pose> waypoints;
             waypoints.push_back(current_pose);
@@ -147,7 +147,7 @@ void Arm::moveArmPath(const std::vector<geometry_msgs::Pose>& path)
                 break;
             }
         }
-        else{ //Otherwise, do a normal plan
+        else{*/ //Otherwise, do a normal plan
 
             geometry_msgs::Pose step = path[i];
             move_group_interface.setPoseTarget(step);
@@ -163,7 +163,7 @@ void Arm::moveArmPath(const std::vector<geometry_msgs::Pose>& path)
                 ROS_ERROR("FAILED TO PLAN NEXT MOVE --- ABORT");
                 break;
             }
-        }
+        //}
     }
 
     ROS_INFO("-----ENDING PATH------");
@@ -232,7 +232,7 @@ std::vector<geometry_msgs::Pose> Arm::pickObj(const geometry_msgs::Pose& object,
 
     geometry_msgs::Pose pose_1;
     pose_1.position = object.position;
-    pose_1.position.z = pose_1.position.z - returnDimesions(id)[1] / 2 +0.22;
+    pose_1.position.z = pose_1.position.z - returnDimesions(id)[1] / 2 +0.21;
     q.setRPY(0, +M_PI/2, 0);
     pose_1.orientation.x = q.x();
     pose_1.orientation.y = q.y();
