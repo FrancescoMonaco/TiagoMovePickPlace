@@ -15,22 +15,22 @@ void doneCb(const actionlib::SimpleClientGoalState& state,
         //pose_z.push_back(result->result_points[i].pose.position.z);
     }
     // Print the list of the poses
-    for(int i = 0; i < pose_x.size(); i++)
+    /*for(int i = 0; i < pose_x.size(); i++)
     {
         ROS_INFO("Object %d in position: (%f, %f)", i+1, pose_x[i], pose_y[i]);//, pose_z[i]);
-    }
+    }*/
 }
 
 void activeCb()
 {
-    ROS_INFO("Goal just went active");
+    //ROS_INFO("Goal just went active");
 }
 
 void feedbackCb(const group_04_a2::TiagoFeedbackConstPtr& feedback)
 {   
     // Take the string from the feedback and print it
     std::string feedback_string = feedback->feedback_message;
-    ROS_INFO("Feedback: %s", feedback_string.c_str());
+    //ROS_INFO("Feedback: %s", feedback_string.c_str());
     if(feedback->status == 4) // If failed shutdown the node
     {
         ros::shutdown();
@@ -57,7 +57,7 @@ void doneCbCamera(const actionlib::SimpleClientGoalState &state, const group_04_
 
 void activeCbCamera()
 {
-    ROS_INFO("Goal just went active");
+    //ROS_INFO("Goal just went active");
 }
 
 void feedbackCbCamera(const group_04_a2::CameraFeedbackConstPtr &feedback)
@@ -73,7 +73,7 @@ void arm_doneCb(const actionlib::SimpleClientGoalState& state, const group_04_a2
 
 void arm_activeCb()
 {
-    ROS_INFO("Goal just went active");
+    //ROS_INFO("Goal just went active");
 }
 
 void arm_feedbackCb(const group_04_a2::ArmFeedbackConstPtr& feedback)
