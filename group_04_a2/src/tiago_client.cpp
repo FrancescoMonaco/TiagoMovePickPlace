@@ -6,7 +6,7 @@ int main(int argc, char **argv)
 {
     // Initialize ROS
     ros::init(argc, argv, "tiago_management");
-    ROS_INFO("Starting tiago_management node");
+    //ROS_INFO("Starting tiago_management node");
     // Initialize the action client
     actionlib::SimpleActionClient<group_04_a2::TiagoAction> ac("tiago_pose", true);
 
