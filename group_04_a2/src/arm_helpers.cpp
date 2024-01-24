@@ -25,8 +25,6 @@ void Arm::safePose(bool tuck){
     // Go up again before tucking
     moveit::planning_interface::MoveGroupInterface move_group_interface("arm_torso");
     const moveit::core::JointModelGroup* joint_model_group = move_group_interface.getCurrentState()->getJointModelGroup("arm_torso");
-    // Print the number of joints in the arm
-    ROS_INFO("Arm with %d joints", joint_model_group->getVariableCount());
     
     move_group_interface.setNumPlanningAttempts(15);
     move_group_interface.setPlanningTime(5);
@@ -41,7 +39,6 @@ void Arm::safePose(bool tuck){
 
     if (success){
         move_group_interface.execute(my_plan);
-        ROS_INFO("Initial position done");
     }
     else{
         ROS_ERROR("FAILED TO PLAN INITIAL POSITION --- ABORT");
@@ -52,8 +49,6 @@ void Arm::safePose(bool tuck){
         // Tuck again the arm as in the beginning
         moveit::planning_interface::MoveGroupInterface move_group_interface("arm_torso");
         const moveit::core::JointModelGroup* joint_model_group = move_group_interface.getCurrentState()->getJointModelGroup("arm_torso");
-        // Print the number of joints in the arm
-        ROS_INFO("Arm with %d joints", joint_model_group->getVariableCount());
         
         move_group_interface.setNumPlanningAttempts(15);
         move_group_interface.setPlanningTime(5);
@@ -69,7 +64,6 @@ void Arm::safePose(bool tuck){
 
         if (success){
             move_group_interface.execute(my_plan);
-            ROS_INFO("Arm tucked");
         }
         else{
             ROS_ERROR("FAILED TO TUCK ARM --- ABORT");
