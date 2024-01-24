@@ -71,10 +71,12 @@ void Arm::placeObject(const group_04_a2::ArmGoalConstPtr &goal){
 std::vector<geometry_msgs::Pose> Arm::placeObj(const geometry_msgs::Pose& object, int id){
     // Angle to place the object
     tf2::Quaternion q; q.setRPY(0, +M_PI/2, 0);
-
+    std::vector<geometry_msgs::Pose> waypoints;
+    std::vector<geometry_msgs::Pose> up_path;
+    /*
     geometry_msgs::Pose pose_0;
     pose_0.position = object.position;
-    pose_0.position.x += 0.16;
+    pose_0.position.x += 0.15;
     pose_0.position.y += 0.05;
     pose_0.orientation.x = q.x();
     pose_0.orientation.y = q.y();
@@ -82,21 +84,21 @@ std::vector<geometry_msgs::Pose> Arm::placeObj(const geometry_msgs::Pose& object
     pose_0.orientation.w = q.w();
     pose_0.position.z += 1.2;
 
-    std::vector<geometry_msgs::Pose> waypoints;
-    std::vector<geometry_msgs::Pose> up_path;
     up_path.push_back(pose_0);
     waypoints.push_back(pose_0);
-
+    */
     geometry_msgs::Pose pose_1;
     pose_1.position = object.position;
-    pose_1.position.x += 0.16;
+    pose_1.position.x += 0.17;
     pose_1.position.y += 0.05;
     pose_1.orientation.x = q.x();
     pose_1.orientation.y = q.y();
     pose_1.orientation.z = q.z();
     pose_1.orientation.w = q.w();
-    pose_1.position.z += 1.05;
+    pose_1.position.z += 1.0;
     waypoints.push_back(pose_1);
+    waypoints.push_back(pose_1);
+    up_path.push_back(pose_1);
     moveArmPath(waypoints);
 
     return up_path;
@@ -134,7 +136,7 @@ void Arm::moveArmPath(const std::vector<geometry_msgs::Pose>& path)
             double fraction = move_group_interface.computeCartesianPath(waypoints, eef_step, jump_threshold, trajectory);
             my_plan.trajectory_ = trajectory;
 
-            bool success = (fraction >=0.7);
+            bool success = (fraction >=0.5);
 
             if (success){
                 move_group_interface.execute(my_plan);

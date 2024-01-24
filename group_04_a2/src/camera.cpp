@@ -18,12 +18,28 @@ void Camera::goalCB(const group_04_a2::CameraGoalConstPtr &goal){
         as_.setSucceeded(result_);
         return;
     }
-    // Lower the head
+    // Lower the head and start accumulating the detections
     setHeadPosition(0.0, -0.57);
     accumulate = true;
     // Sleep for a little to store the detections
-    //take current time
     ros::Time start = ros::Time::now();
+    while(ros::Time::now() - start < ros::Duration(1.5)){
+        ros::spinOnce();
+    }
+    accumulate = false;
+    setHeadPosition(0.1, -0.50);
+    accumulate = true;
+    // Move to the right
+    start = ros::Time::now();
+    while(ros::Time::now() - start < ros::Duration(1.5)){
+        ros::spinOnce();
+    }
+    accumulate = false;
+
+    setHeadPosition(-0.1, -0.50);
+    accumulate = true;
+    // Move to the left
+    start = ros::Time::now();
     while(ros::Time::now() - start < ros::Duration(1.5)){
         ros::spinOnce();
     }

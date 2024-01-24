@@ -28,6 +28,7 @@ int main(int argc, char **argv)
 
     // For each object
     for(int actual_color : objects){
+        ROS_INFO("Object to pick: %d", actual_color);
         // Container for the camera results
         group_04_a2::CameraResultConstPtr camera_pointer;
 
