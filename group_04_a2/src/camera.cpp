@@ -5,8 +5,11 @@ typedef actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction>
 
 //*** Function implementation
 void Camera::goalCB(const group_04_a2::CameraGoalConstPtr &goal){
+    // Clear the result
     result_.poses.clear();
     result_.ids.clear();
+
+    // If color recognition is required, call the colorGoalCB function
     if(goal->color_recognition){
         setHeadPosition(0.15, -0.52);
         ros::Time start = ros::Time::now();
@@ -18,7 +21,9 @@ void Camera::goalCB(const group_04_a2::CameraGoalConstPtr &goal){
         as_.setSucceeded(result_);
         return;
     }
-    // Lower the head and start accumulating the detections
+
+    // Otherwise lower the head and start accumulating the detections
+    ROS_INFO("Moving the head to recognize the objects");
     setHeadPosition(0.0, -0.57);
     accumulate = true;
     // Sleep for a little to store the detections
@@ -45,8 +50,10 @@ void Camera::goalCB(const group_04_a2::CameraGoalConstPtr &goal){
     }
     accumulate = false;
 
+    // Create a vector of poses and a vector of ids
     std::vector<geometry_msgs::Pose> poses;
     std::vector<int> index;
+    
     // Iterate on the map and compute the average pose for each object
     for(auto element: tag_detections_){
         // Compute the average pose

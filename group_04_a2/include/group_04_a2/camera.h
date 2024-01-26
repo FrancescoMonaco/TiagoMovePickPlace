@@ -33,6 +33,9 @@ public:
     // Subscribe to tag_detections topic
     sub_det_ = nh_.subscribe("/tag_detections", 1, &Camera::tagDetectionsCB, this);
     sub_camera_ = nh_.subscribe("/xtion/rgb/image_raw", 1, &Camera::imageCallback, this);
+
+    // Allow the buffer to use a dedicated thread
+    tf_buffer_.setUsingDedicatedThread(true);
     as_.start();
   }
     
