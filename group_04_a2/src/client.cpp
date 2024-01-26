@@ -133,7 +133,7 @@ group_04_a2::CameraResultConstPtr cameraDetection(bool color_recognition){
     // Wait for the action server to start
     ROS_INFO("Waiting for camera action server to start.");
     ac_camera.waitForServer();
-    ROS_INFO("Camera ction server started, sending goal.");
+    ROS_INFO("Camera action server started, sending goal.");
     // Send the goal to the action server
     ac_camera.sendGoal(goal, &doneCbCamera, &activeCbCamera, &feedbackCbCamera);
     // Wait for the result
@@ -216,7 +216,7 @@ std::vector<geometry_msgs::PoseStamped> computeBarrelPose(geometry_msgs::PoseSta
         to_push.pose.orientation.w = q.w();
         path.push_back(to_push);
 
-        ROS_INFO(" TO GO at position (%f, %f)", to_push.pose.position.x, to_push.pose.position.y);
+        ROS_INFO("GO at position (%f, %f)", to_push.pose.position.x, to_push.pose.position.y);
             
     }
     else if (direction == 1) //up straight
@@ -231,7 +231,7 @@ std::vector<geometry_msgs::PoseStamped> computeBarrelPose(geometry_msgs::PoseSta
         to_push.pose.orientation.w = q.w();
         path.push_back(to_push);
 
-        ROS_INFO(" TO GO at position (%f, %f)", to_push.pose.position.x, to_push.pose.position.y);
+        ROS_INFO("GO at position (%f, %f)", to_push.pose.position.x, to_push.pose.position.y);
     }
     else //diagonal left
     {
@@ -256,7 +256,7 @@ std::vector<geometry_msgs::PoseStamped> computeBarrelPose(geometry_msgs::PoseSta
         to_push.pose.orientation.w = q.w();
         path.push_back(to_push);
 
-        ROS_INFO(" TO GO at position (%f, %f)", to_push.pose.position.x, to_push.pose.position.y);
+        ROS_INFO("GO at position (%f, %f)", to_push.pose.position.x, to_push.pose.position.y);
     }
 
     return path;
