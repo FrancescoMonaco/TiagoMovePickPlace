@@ -73,20 +73,6 @@ std::vector<geometry_msgs::Pose> Arm::placeObj(const geometry_msgs::Pose& object
     tf2::Quaternion q; q.setRPY(0, +M_PI/2, 0);
     std::vector<geometry_msgs::Pose> waypoints;
     std::vector<geometry_msgs::Pose> up_path;
-    /*
-    geometry_msgs::Pose pose_0;
-    pose_0.position = object.position;
-    pose_0.position.x += 0.15;
-    pose_0.position.y += 0.05;
-    pose_0.orientation.x = q.x();
-    pose_0.orientation.y = q.y();
-    pose_0.orientation.z = q.z();
-    pose_0.orientation.w = q.w();
-    pose_0.position.z += 1.2;
-
-    up_path.push_back(pose_0);
-    waypoints.push_back(pose_0);
-    */
     geometry_msgs::Pose pose_1;
     pose_1.position = object.position;
     pose_1.position.x += 0.17;
@@ -197,7 +183,6 @@ std::vector<geometry_msgs::Pose> Arm::pickObj(const geometry_msgs::Pose& object,
     pose_0.orientation.w = q.w();
     path_blue.push_back(pose_0);
     up_path.push_back(pose_0);
-    //ROS_INFO("WAYPOINT 1: (%f, %f, %f)", pose_0.position.x, pose_0.position.y, pose_0.position.z);
 
     geometry_msgs::Pose pose_1;
     pose_1.position = object.position;
