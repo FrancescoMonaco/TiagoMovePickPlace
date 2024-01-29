@@ -12,25 +12,17 @@ void doneCb(const actionlib::SimpleClientGoalState& state,
     {
         pose_x.push_back(result->result_points[i].pose.position.x);
         pose_y.push_back(result->result_points[i].pose.position.y);
-        //pose_z.push_back(result->result_points[i].pose.position.z);
     }
-    // Print the list of the poses
-    /*for(int i = 0; i < pose_x.size(); i++)
-    {
-        ROS_INFO("Object %d in position: (%f, %f)", i+1, pose_x[i], pose_y[i]);//, pose_z[i]);
-    }*/
 }
 
 void activeCb()
 {
-    //ROS_INFO("Goal just went active");
 }
 
 void feedbackCb(const group_04_a2::TiagoFeedbackConstPtr& feedback)
 {   
     // Take the string from the feedback and print it
     std::string feedback_string = feedback->feedback_message;
-    //ROS_INFO("Feedback: %s", feedback_string.c_str());
     if(feedback->status == 4) // If failed shutdown the node
     {
         ros::shutdown();
@@ -57,7 +49,6 @@ void doneCbCamera(const actionlib::SimpleClientGoalState &state, const group_04_
 
 void activeCbCamera()
 {
-    //ROS_INFO("Goal just went active");
 }
 
 void feedbackCbCamera(const group_04_a2::CameraFeedbackConstPtr &feedback)
@@ -73,7 +64,6 @@ void arm_doneCb(const actionlib::SimpleClientGoalState& state, const group_04_a2
 
 void arm_activeCb()
 {
-    //ROS_INFO("Goal just went active");
 }
 
 void arm_feedbackCb(const group_04_a2::ArmFeedbackConstPtr& feedback)
@@ -81,7 +71,6 @@ void arm_feedbackCb(const group_04_a2::ArmFeedbackConstPtr& feedback)
     ROS_INFO("Got Feedback of the Arm");
 }
 
-//*** Other functions
 /**
  * Creates the TiagoGoal objects for robot motion
  * 
@@ -96,17 +85,6 @@ void arm_feedbackCb(const group_04_a2::ArmFeedbackConstPtr& feedback)
  */
 group_04_a2::TiagoGoal createGoal(double px, double py, double pz, double ox, double oy, double oz, double ow, bool linear_init)
 {   
-   /*// Check if the goal is valid
-    if(z != 0 || t1 != 0 || t2 != 0)
-    {
-        // Print an error message
-        ROS_INFO("The goal is not valid, the robot can only move in the x-y plane");
-        // Shutdown the node
-        ros::shutdown();
-    }*/
-
-    // Check if the goal is in the map (TO DO)
-
     group_04_a2::TiagoGoal goal;
     // use geometry_msgs::PoseStamped to set the goal pose
     goal.goal_pose.header.frame_id = "map";
