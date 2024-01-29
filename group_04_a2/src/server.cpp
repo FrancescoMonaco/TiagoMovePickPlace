@@ -1,7 +1,6 @@
 #include <group_04_a2/server.h>
 #include <group_04_a2/obstacle_finder.h>
 #include <group_04_a2/motion_law.h>
-//*** Function implementation
 
     void Tiago::goalCB(){
         auto goal = as_.acceptNewGoal();
@@ -18,7 +17,6 @@
         // Set the feedback message
         feedback_.feedback_message = "Waiting for the arm to tuck";
         as_.publishFeedback(feedback_);
-        //ros::Duration(13.0).sleep();
         // Motion Law
         // Send feedback of motion law
         // Set the feedback header
@@ -44,7 +42,6 @@
     }
 
     void Tiago::preemptCB(){
-        ROS_INFO("%s: Preempted", action_name_.c_str());
         as_.setPreempted();
     }
 
