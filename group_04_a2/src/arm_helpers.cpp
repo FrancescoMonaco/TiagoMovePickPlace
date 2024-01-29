@@ -20,6 +20,11 @@ std::vector<double> Arm::returnDimesions(int id){
     else { return std::vector<double> {0.086602,0.10000, 0.22500}; }
 }
 
+/**
+ * Moving the arm to a safe pose
+ * 
+ * @param tuck variable used to check if need to tuck the arm
+ */
 void Arm::safePose(bool tuck){
         
     // Go up again before tucking
@@ -214,6 +219,11 @@ std::vector<std::string> Arm::addCollisionObjects(std::vector<geometry_msgs::Pos
     return collision_names;
 }
 
+/**
+ * Attach virtually the object to the gripper
+ * 
+ * @param id id of the object that will be attached to the gripper
+ */
 void Arm::attachObjectToGripper(int id){
     // Create a service client for attaching objects
     attachClient_ = nh_.serviceClient<gazebo_ros_link_attacher::Attach>("/link_attacher_node/attach");
@@ -240,7 +250,6 @@ void Arm::attachObjectToGripper(int id){
     // Call the Attach service
     if (attachClient_.call(attachSrv))
     {
-        ROS_INFO("Object attached to arm_7_link");
     }
     else
     {
@@ -248,6 +257,11 @@ void Arm::attachObjectToGripper(int id){
     }
 }
 
+/**
+ * Detach virtually the object from the gripper
+ * 
+ * @param id id of the object that will be detached from the gripper
+ */
 void Arm::detachObjectFromGripper(int id){
     // Create a service client for detaching objects
     detachClient_ = nh_.serviceClient<gazebo_ros_link_attacher::Attach>("/link_attacher_node/detach");
@@ -272,7 +286,7 @@ void Arm::detachObjectFromGripper(int id){
     }
 
     // Call the Detach service
-    if (detachClient_.call(detachSrv)) ROS_INFO("Object detached from arm_7_link");
+    if (detachClient_.call(detachSrv)) ;
     else ROS_ERROR("Failed to detach object from arm_7_link");
 }
 
