@@ -158,7 +158,7 @@ void Camera::setHeadPosition(double pan, double tilt){
 
     // Check if the action was successful
     if (headClient.getState() == actionlib::SimpleClientGoalState::SUCCEEDED) {
-        //ROS_INFO("Head movement succeeded");
+        ROS_INFO("Head movement succeeded");
     } else {
         ROS_ERROR("Head movement failed");
     }
@@ -209,7 +209,7 @@ std::vector<int> Camera::colorGoalCB(const group_04_a2::CameraGoalConstPtr &goal
     cv::calcHist(&sub_image_1_channels[0], 1, 0, cv::Mat(), hist_1, 1, &histSize, &histRange, uniform, accumulate);
     cv::calcHist(&sub_image_2_channels[1], 1, 0, cv::Mat(), hist_2, 1, &histSize, &histRange, uniform, accumulate);
     cv::calcHist(&sub_image_3_channels[2], 1, 0, cv::Mat(), hist_3, 1, &histSize, &histRange, uniform, accumulate);
-    //ROS_INFO("Histograms computed");
+    //compute histograms
     std::vector<int> color_codes;
     int max_1 = 0, max_2 = 0, max_3 = 0;
     int max_index_1 = 0, max_index_2 = 0, max_index_3 = 0;
