@@ -1,6 +1,8 @@
 #include <group_04_a2/human_client.h>
 
-    std::vector<int> get_order()
+/// @brief Get the order of the objects from human_node
+/// @return std::vector<int> The order of the objects
+std::vector<int> get_order()
     {
         // use a service to get the objects
         ros::NodeHandle nh;
@@ -24,4 +26,4 @@
         // Get the objects
         std::vector<int> objects = srv.response.ids;
         return objects;
-    }
+}

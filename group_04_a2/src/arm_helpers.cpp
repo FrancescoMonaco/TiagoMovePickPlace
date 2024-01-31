@@ -1,11 +1,8 @@
 #include <group_04_a2/arm.h>
 
-/**
- * Return the dimensions of each collision object, based on the id
- * 
- * @param id id of the collision object to return its dimensions
- * @return Dimensions of the collision object.
- */
+/// @brief Return the dimensions of each collision object, based on the id
+/// @param id of the object to return its dimensions
+/// @return vector of dimensions of the collision object
 std::vector<double> Arm::returnDimesions(int id){
     //if object is BLUE
     if(id == 1) { return std::vector<double> {0.050301,0.054000,0.1}; }
@@ -20,14 +17,13 @@ std::vector<double> Arm::returnDimesions(int id){
     else { return std::vector<double> {0.086602,0.10000, 0.22500}; }
 }
 
-/**
- * Moving the arm to a safe pose
- * 
- * @param tuck variable used to check if need to tuck the arm
- */
+/// @brief Move the arm to a safe pose and tuck it if requested
+/// @param tuck, true if tuck, false if safe pose
 void Arm::safePose(bool tuck){
         
     // Go up again before tucking
+
+    // Variables for MoveIt
     moveit::planning_interface::MoveGroupInterface move_group_interface("arm_torso");
     const moveit::core::JointModelGroup* joint_model_group = move_group_interface.getCurrentState()->getJointModelGroup("arm_torso");
     
@@ -50,6 +46,7 @@ void Arm::safePose(bool tuck){
         return;
     }
 
+    // If we need to tuck the arm
     if(tuck){
         // Tuck again the arm as in the beginning
         moveit::planning_interface::MoveGroupInterface move_group_interface("arm_torso");
@@ -78,17 +75,18 @@ void Arm::safePose(bool tuck){
 }
 
 
-/**
- * Adds into the planning scene the collision objects, saving their names
- * 
- * @param objects poses of the detected apriltags
- * @param ids ids of the detected apriltags
- * @param pick "Are we in a picking session?"
- * @return collision objects' names
- */
+/// @brief Add the objects to the collision objects, if pick is false the added objects will be the place tables,
+///         if adjust is true the place tables will be enlarged
+/// @param objects vector of poses of the objects
+/// @param ids  vector of ids of the objects
+/// @param pick, true if pick, false if place
+/// @param adjust, true if we need to adjust the object
+/// @return vector of names of the added objects
 std::vector<std::string> Arm::addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::vector<int>& ids, bool pick, bool adjust){
     std::vector<moveit_msgs::CollisionObject> collision_objects;
     std::vector<std::string> collision_names;
+
+    // If we're picking
     if (pick){
 
         // Add the objects to the collision objects
@@ -145,7 +143,7 @@ std::vector<std::string> Arm::addCollisionObjects(std::vector<geometry_msgs::Pos
 
         collision_objects.push_back(table_coll_object);
     }
-    else{ 
+    else{ // If we're placing
         // Tables for the place task
        moveit_msgs::CollisionObject red_pill;
         red_pill.header.frame_id = "map";
@@ -216,15 +214,14 @@ std::vector<std::string> Arm::addCollisionObjects(std::vector<geometry_msgs::Pos
     }
     // Add the collision object to the planning scene
     planning_scene_interface_.applyCollisionObjects(collision_objects);
+    // return the names of the collision objects to be removed later
     return collision_names;
 }
 
-/**
- * Attach virtually the object to the gripper
- * 
- * @param id id of the object that will be attached to the gripper
- */
+/// @brief Attach the object to the gripper using gazebo_ros_link_attacher
+/// @param id of the object
 void Arm::attachObjectToGripper(int id){
+    
     // Create a service client for attaching objects
     attachClient_ = nh_.serviceClient<gazebo_ros_link_attacher::Attach>("/link_attacher_node/attach");
 
@@ -257,12 +254,10 @@ void Arm::attachObjectToGripper(int id){
     }
 }
 
-/**
- * Detach virtually the object from the gripper
- * 
- * @param id id of the object that will be detached from the gripper
- */
+/// @brief Detach the object from the gripper using gazebo_ros_link_attacher 
+/// @param id of the object
 void Arm::detachObjectFromGripper(int id){
+
     // Create a service client for detaching objects
     detachClient_ = nh_.serviceClient<gazebo_ros_link_attacher::Attach>("/link_attacher_node/detach");
 

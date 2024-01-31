@@ -21,6 +21,8 @@
 class Arm
 {
 public:
+    /// @brief Constructor for the action server
+    /// @param name name of the node
     Arm(std::string name):
     as_(nh_, name, boost::bind(&Arm::goalCB, this, _1), false),
     action_name_(name)
@@ -31,35 +33,45 @@ public:
     ~Arm(){}
 
     /// @brief Callback function for the action server
-    /// @param goal from the client
+    /// @param goal contains the ids of the objects on the table and a bool to pick or place
     void goalCB(const group_04_a2::ArmGoalConstPtr &goal);
 
-    /// @brief Pick the object from the table
-    /// @param goal 
+    /// @brief Start the pick sequence
+    /// @param goal contains the ids of the objects on the table
     void pickObject(const group_04_a2::ArmGoalConstPtr &goal);
 
-    /// @brief Place the object on the table
-    /// @param goal 
+    /// @brief Start the place sequence
+    /// @param goal contains the ids of the objects on the table
     void placeObject(const group_04_a2::ArmGoalConstPtr &goal);
 
 
 protected:
+    /// @brief Node handle
     ros::NodeHandle nh_;
+    /// @brief Action server
     actionlib::SimpleActionServer<group_04_a2::ArmAction> as_;
+    /// @brief Name of the action
     std::string action_name_;
+    /// @brief Feedback and result of the action
     group_04_a2::ArmFeedback feedback_;
+    /// @brief Result of the action
     group_04_a2::ArmResult result_;
 
 private:
+    /// @brief Move group interface, used to move the arm
     moveit::planning_interface::PlanningSceneInterface planning_scene_interface_;
+    /// @brief Client to attach the object to the gripper
     ros::ServiceClient attachClient_;
+    /// @brief Client to detach the object from the gripper
     ros::ServiceClient detachClient_;
     
-    /// @brief Add the objects to the collision objects
-    /// @param objects
-    /// @param ids
+    /// @brief Add the objects to the collision objects, if pick is false the added objects will be the place tables,
+    ///         if adjust is true the place tables will be enlarged
+    /// @param objects vector of poses of the objects
+    /// @param ids  vector of ids of the objects
     /// @param pick, true if pick, false if place
     /// @param adjust, true if we need to adjust the object
+    /// @return vector of names of the added objects
     std::vector<std::string> addCollisionObjects(std::vector<geometry_msgs::Pose>& objects, std::vector<int>& ids, bool pick, bool adjust=false);
 
     /// @brief Subroutine to pick the object using intermediate poses
@@ -74,27 +86,29 @@ private:
     /// @return path of poses to go up from the object
     std::vector<geometry_msgs::Pose> placeObj(const geometry_msgs::Pose& object, int id);
 
-    /// @brief Given a path of poses, move the arm
-    /// @param path, path of poses
+    /// @brief Plans and executes the path given in input
+    /// @param path, path of the motions the robot arm has to do to reach the target position
     void moveArmPath(const std::vector<geometry_msgs::Pose>& path);
 
-    /// @brief Given an object id, return the dimensions of the object
-    /// @param id of the object
+    /// @brief Return the dimensions of each collision object, based on the id
+    /// @param id of the object to return its dimensions
+    /// @return vector of dimensions of the collision object
     std::vector<double> returnDimesions(int id);
 
     /// @brief Open or close the gripper
     /// @param open, true if open, false if close
+    /// @param id of the object to attach or detach
     void gripper(bool open, int id);
 
-    /// @brief Attach the object to the gripper and close the gripper
+    /// @brief Attach the object to the gripper using gazebo_ros_link_attacher
     /// @param id of the object
     void attachObjectToGripper(int id);
 
-    /// @brief Detach the object from the gripper and open the gripper
+    /// @brief Detach the object from the gripper using gazebo_ros_link_attacher
     /// @param id of the object
     void detachObjectFromGripper(int id);
 
-    /// @brief Move the arm to a safe pose or tuck it
+    /// @brief Move the arm to a safe pose and tuck it if requested
     /// @param tuck, true if tuck, false if safe pose
     void safePose(bool tuck);
 };

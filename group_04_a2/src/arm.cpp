@@ -1,10 +1,7 @@
 #include <group_04_a2/arm.h>
 
-/**
- * Starts the picking session. 
- * 
- * @param goal ids and objects of the scene. Only one of it will be picked
- */
+/// @brief Start the pick sequence
+/// @param goal contains the ids of the objects on the table
 void Arm::pickObject(const group_04_a2::ArmGoalConstPtr &goal){
     //Pick the vector of objects and ids
     std::vector<geometry_msgs::Pose> objects = goal->poses;
@@ -31,11 +28,8 @@ void Arm::pickObject(const group_04_a2::ArmGoalConstPtr &goal){
     as_.setSucceeded();
 }
 
-/**
- * Starts the placing session. 
- * 
- * @param goal ids and objects of the scene. Only one of it will be placed
- */
+/// @brief Start the place sequence
+/// @param goal contains the ids of the objects on the table
 void Arm::placeObject(const group_04_a2::ArmGoalConstPtr &goal){   
     std::vector<geometry_msgs::Pose> objects = goal->poses;
     std::vector<int> ids = goal->ids;
@@ -68,9 +62,16 @@ void Arm::placeObject(const group_04_a2::ArmGoalConstPtr &goal){
     as_.setSucceeded();
 }
 
+/// @brief Subroutine to place the object using intermediate poses
+/// @param object, pose of the object to place
+/// @param id, id of the object to place
+/// @return path of poses to go up from the object
 std::vector<geometry_msgs::Pose> Arm::placeObj(const geometry_msgs::Pose& object, int id){
+    
     // Angle to place the object
     tf2::Quaternion q; q.setRPY(0, +M_PI/2, 0);
+
+    // Vectors for the poses and the return path
     std::vector<geometry_msgs::Pose> waypoints;
     std::vector<geometry_msgs::Pose> up_path;
     geometry_msgs::Pose pose_1;
@@ -82,26 +83,25 @@ std::vector<geometry_msgs::Pose> Arm::placeObj(const geometry_msgs::Pose& object
     pose_1.orientation.z = q.z();
     pose_1.orientation.w = q.w();
     pose_1.position.z += 1.0;
+
     waypoints.push_back(pose_1);
     waypoints.push_back(pose_1);
     up_path.push_back(pose_1);
+
+    // Move the arm
     moveArmPath(waypoints);
 
     return up_path;
 }   
 
 
-/**
- * Plans and executes the path given in input
- * 
- * @param path path of the motions Tiago robot has to do to reach the target position
- */
+/// @brief Plans and executes the path given in input
+/// @param path, path of the motions the robot arm has to do to reach the target position
 void Arm::moveArmPath(const std::vector<geometry_msgs::Pose>& path)
 {
     ROS_INFO("-----STARTING PATH------");
 
     moveit::planning_interface::MoveGroupInterface move_group_interface("arm_torso");
-    //const moveit::core::JointModelGroup* joint_model_group = move_group_interface.getCurrentState()->getJointModelGroup("arm_torso");
     move_group_interface.setPoseReferenceFrame("base_footprint"); //or base_footprint
     move_group_interface.setNumPlanningAttempts(16);
     move_group_interface.setPlanningTime(7);
@@ -109,7 +109,10 @@ void Arm::moveArmPath(const std::vector<geometry_msgs::Pose>& path)
     moveit::planning_interface::MoveGroupInterface::Plan my_plan;
 
     for(int i=0; i<path.size(); i++){
+
         // If its the last pose, do a cartesian path
+        //*** THIS WORKS ONLY IN LOCAL SIMULATION ***
+
        /* if(i == path.size()-1){
             geometry_msgs::Pose current_pose = move_group_interface.getCurrentPose().pose;
             std::vector<geometry_msgs::Pose> waypoints;
@@ -141,8 +144,7 @@ void Arm::moveArmPath(const std::vector<geometry_msgs::Pose>& path)
             bool success = (move_group_interface.plan(my_plan) == moveit::planning_interface::MoveItErrorCode::SUCCESS);
         
             if (success){
-                // move_group_interface.setStartStateToCurrentState() 
-                move_group_interface.execute(my_plan); //
+                move_group_interface.execute(my_plan); 
             }
             else{
                 ROS_ERROR("FAILED TO PLAN NEXT MOVE --- ABORT");
@@ -156,13 +158,11 @@ void Arm::moveArmPath(const std::vector<geometry_msgs::Pose>& path)
     return;
 }
 
-/**
- * For each object to pick (BLUE hexagon prism, GREEN pyramid, RED cube), this function returns the path
- * of motions Tiago has to do in order to reach the object iself
- * 
- * @param object pose of the object Tiago has to pick
- * @param id id (and so, color) of the object Tiago has to pick
- */
+
+/// @brief Subroutine to pick the object using intermediate poses
+/// @param object, pose of the object to pick
+/// @param id, id of the object to pick
+/// @return path of poses to go up from the object
 std::vector<geometry_msgs::Pose> Arm::pickObj(const geometry_msgs::Pose& object, int id){
     // Move to a safe pose
     safePose(false);
@@ -194,6 +194,7 @@ std::vector<geometry_msgs::Pose> Arm::pickObj(const geometry_msgs::Pose& object,
     pose_1.orientation.w = q.w();
     path_blue.push_back(pose_1); 
     
+    // Move the arm
     moveArmPath(path_blue);
     
    }
@@ -224,6 +225,7 @@ std::vector<geometry_msgs::Pose> Arm::pickObj(const geometry_msgs::Pose& object,
     pose_1.orientation.w = q.w();
     path_red.push_back(pose_1); 
     
+    // Move the arm
     moveArmPath(path_red);
    }
     else {
@@ -254,7 +256,7 @@ std::vector<geometry_msgs::Pose> Arm::pickObj(const geometry_msgs::Pose& object,
     pose_3.orientation.w = q.w();
     path_green.push_back(pose_3);
 
-
+    // Move the arm
     moveArmPath(path_green);
     }
 
@@ -262,6 +264,8 @@ std::vector<geometry_msgs::Pose> Arm::pickObj(const geometry_msgs::Pose& object,
 
 }
 
+/// @brief Callback function for the action server
+/// @param goal contains the ids of the objects on the table and a bool to pick or place
 void Arm::goalCB(const group_04_a2::ArmGoalConstPtr &goal){
     auto goal_ = as_.acceptNewGoal();
 
@@ -271,12 +275,17 @@ void Arm::goalCB(const group_04_a2::ArmGoalConstPtr &goal){
     else placeObject(goal);
 }
 
+/// @brief Open or close the gripper
+/// @param open, true if open, false if close
+/// @param id of the object to attach or detach
 void Arm::gripper(bool open, int id){
+
     // Remove the object from the collision objects
     std::vector<std::string> object_ids;
     object_ids.push_back("object" + std::to_string(id));
     planning_scene_interface_.removeCollisionObjects(object_ids);
 
+    // Attach or detach the object
     if (open) detachObjectFromGripper(id);
     else attachObjectToGripper(id);
     

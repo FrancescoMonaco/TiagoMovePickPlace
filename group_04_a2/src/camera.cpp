@@ -4,6 +4,9 @@
 typedef actionlib::SimpleActionClient<control_msgs::FollowJointTrajectoryAction> TrajectoryClient;
 
 //*** Function implementation
+
+/// @brief Function that is called when the goal is received
+/// @param goal Goal containing a bool to decide if we need detection or color recognition
 void Camera::goalCB(const group_04_a2::CameraGoalConstPtr &goal){
     // Clear the result
     result_.poses.clear();
@@ -95,6 +98,9 @@ void Camera::goalCB(const group_04_a2::CameraGoalConstPtr &goal){
     as_.setSucceeded(result_);
 }
 
+/// @brief Function that is called when the tag_detections topic is received, it stores the detections
+///        after transforming them in the base frame in a map  
+/// @param msg Message containing the tag detections
 void Camera::tagDetectionsCB(const apriltag_ros::AprilTagDetectionArray::ConstPtr &msg)
 {   
     if (!accumulate) {
@@ -118,12 +124,15 @@ void Camera::tagDetectionsCB(const apriltag_ros::AprilTagDetectionArray::ConstPt
             // Store the pose in the map
             tag_detections_[detection.id[0]].push_back(tag_pose_base);
         } catch (tf2::TransformException& ex) {
-            //ROS_WARN("Failed to transform tag pose: %s", ex.what());
+            ROS_WARN("Failed to transform tag pose: %s", ex.what());
         }
     }
 
 }
 
+/// @brief Function that sets the head position using the trajectory action server
+/// @param pan Pan position
+/// @param tilt Tilt position
 void Camera::setHeadPosition(double pan, double tilt){
     // Initialize ROS node
     ros::NodeHandle nh;
@@ -169,6 +178,8 @@ void Camera::setHeadPosition(double pan, double tilt){
     return;
 }
 
+/// @brief Function that is called when the camera topic is received, it stores the image as a cv::Mat
+/// @param msg Message containing the camera image
 void Camera::imageCallback(const sensor_msgs::ImageConstPtr& msg){
     // Convert the image to a cv::Mat and store it
     cv_bridge::CvImagePtr cv_ptr;
@@ -181,8 +192,11 @@ void Camera::imageCallback(const sensor_msgs::ImageConstPtr& msg){
     }
 }
 
+/// @brief Function that is called when color recognition is required
+/// @param goal Goal containing the order of the objects
 std::vector<int> Camera::colorGoalCB(const group_04_a2::CameraGoalConstPtr &goal){
 
+    ROS_INFO("Recognizing the colors");
     // Take the image and extract three vertical subimages
     cv::Mat image = image_;
     // Convert the image to HSV, we will use the H channel to recognize the colors

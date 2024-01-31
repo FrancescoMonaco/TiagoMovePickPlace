@@ -16,8 +16,8 @@
 //*** Movement functions declaration
 
 /// @brief Function that is called when the goal completes
-/// @param state  
-/// @param result 
+/// @param state  State of the goal 
+/// @param result Result of the laser reading
 void doneCb(const actionlib::SimpleClientGoalState& state,
             const group_04_a2::TiagoResultConstPtr& result);
 

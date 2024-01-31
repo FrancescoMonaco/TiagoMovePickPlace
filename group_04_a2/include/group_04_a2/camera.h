@@ -43,29 +43,32 @@ public:
     ~Camera(void){}
 
     /// @brief Function that is called when the goal is received
-    /// @param goal Goal containing the order of the objects
+    /// @param goal Goal containing a bool to decide if we need detection or color recognition
     void goalCB(const group_04_a2::CameraGoalConstPtr &goal);
 
     /// @brief Function that is called when color recognition is required
     /// @param goal Goal containing the order of the objects
     std::vector<int> colorGoalCB(const group_04_a2::CameraGoalConstPtr &goal);
 
-    /// @brief Function that is called when the camera topic is received
+    /// @brief Function that is called when the camera topic is received, it stores the image as a cv::Mat
     /// @param msg Message containing the camera image
     void imageCallback(const sensor_msgs::ImageConstPtr& msg);
 
-    /// @brief Function that is called when the tag_detections topic is received
+    /// @brief Function that is called when the tag_detections topic is received, it stores the detections
+    ///        after transforming them in the base frame in a map  
     /// @param msg Message containing the tag detections
     void tagDetectionsCB(const apriltag_ros::AprilTagDetectionArray::ConstPtr& msg);
 
-    /// @brief Function that sets the head position
+    /// @brief Function that sets the head position using the trajectory action server
     /// @param pan Pan position
     /// @param tilt Tilt position
     void setHeadPosition(double pan, double tilt);
 
 
 protected:
+    // Node handle
     ros::NodeHandle nh_;
+    // Variables for the action server
     actionlib::SimpleActionServer<group_04_a2::CameraAction> as_;
     std::string action_name_;
     group_04_a2::CameraFeedback feedback_;

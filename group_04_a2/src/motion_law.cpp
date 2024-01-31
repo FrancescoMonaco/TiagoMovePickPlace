@@ -1,5 +1,6 @@
 #include <group_04_a2/motion_law.h>
 
+// Global variables for the Motion Law
 sensor_msgs::LaserScan laser_scan;
 bool goal_reached_ = false;
 bool pass = false;
@@ -7,9 +8,8 @@ ros::Publisher vel_pub_;
 ros::Subscriber laser_sub_;
 ros::Subscriber odom_sub_;
 
-/**
-*  Read the data form LaserScan and store them in laser_scan
-*/
+/// @brief Callback function for the laser scanner, it stores the data in laser_scan
+/// @param laser_msg read the data from the laser scanner
 void laserCallback(const sensor_msgs::LaserScan::ConstPtr& laser_msg) {
         // Store the laser scan data for later use
         laser_scan = *laser_msg;
@@ -38,9 +38,8 @@ bool passageCrossed() {
     return false;
 }
 
-/**
-* Function that sends the commands to move the robot
-*/
+/// @brief Function that receives odometry data and computes the velocities to move the robot
+/// @param odom_msg odometry data
 void odomCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& odom_msg) {
     if (!goal_reached_) {
         // Compute velocities to move toward the goal based on odometry data
@@ -67,9 +66,8 @@ void odomCallback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& odom
     }
 }
 
-/**
-* Create the nodes and subscribe to the specific topics
-*/
+/// @brief Function that moves the robot in the corridor
+/// @param pos goal pose
 void motion (geometry_msgs::PoseStamped pos){
 	ros::NodeHandle nh_, nh1_, nh2_;
     vel_pub_ = nh_.advertise<geometry_msgs::Twist>("mobile_base_controller/cmd_vel", 1);
@@ -86,6 +84,7 @@ void motion (geometry_msgs::PoseStamped pos){
 	return;
 	}
 
+/// @brief Function that rotates the robot when it can't move forward
 void recovery_rotation(){
     for (int i = 0; i < 50; i++){
         geometry_msgs::Twist vel_cmd;

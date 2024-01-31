@@ -17,9 +17,12 @@
 //*** Class definition
 class Tiago{
     public:
+        /// @brief Constructor for the Tiago class
+        /// @param name Name of the action server
         Tiago(std::string name):
             as_(nh_, name, false),
             action_name_(name){
+                // Setup all the subscribers, publishers and callbacks
                 as_.registerGoalCallback(boost::bind(&Tiago::goalCB, this));
                 as_.registerPreemptCallback(boost::bind(&Tiago::preemptCB, this));
                 as_.start();
@@ -29,6 +32,7 @@ class Tiago{
                 sub_laser_ = nh_.subscribe("scan", 1, &Tiago::laserCB, this);
             }
         
+    /// @brief Destructor for the Tiago class
         ~Tiago(void){}
 
     /// @brief Function that is called when the goal is received

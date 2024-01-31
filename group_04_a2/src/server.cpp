@@ -2,6 +2,7 @@
 #include <group_04_a2/obstacle_finder.h>
 #include <group_04_a2/motion_law.h>
 
+    /// @brief Function that is called when the goal is received
     void Tiago::goalCB(){
         auto goal = as_.acceptNewGoal();
         goal_ = goal->goal_pose;
@@ -41,10 +42,12 @@
         as_.publishFeedback(feedback_);
     }
 
+    /// @brief Function that is called when the goal is preempted
     void Tiago::preemptCB(){
         as_.setPreempted();
     }
 
+    /// @brief Function that is called when the node move_base/result publishes
     void Tiago::poseCB(const move_base_msgs::MoveBaseActionResult::ConstPtr& msg){
         // Check if the robot has reached the goal in /move_base/result
         if(msg->status.status == 3){
@@ -100,6 +103,7 @@
 
     }
 
+    /// @brief Function that provides additional feedback to the client
     void Tiago::feedCB(const geometry_msgs::PoseStamped::ConstPtr& msg){
         if(!as_.isActive())
             return; 
@@ -132,16 +136,19 @@
         }
     }
 
+    /// @brief Function that updates the data about the robot position
     void Tiago::updateCB(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& msg){
         // Save the old position
         pose_previous_= pose_actual_;
         pose_actual_ = msg->pose.pose;
     }
 
+    /// @brief Function that updates the data about the laser scan
     void Tiago::laserCB(const sensor_msgs::LaserScan::ConstPtr& msg){
         laser_msg_ = msg;
     }
 
+    /// @brief Function that computes the position of the objects and sets the success of the goal
     void Tiago::computeObjectPosition(){
         // Return feedback to the client
             // Set the feedback header
