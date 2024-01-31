@@ -222,16 +222,13 @@ include_directories(
 
 add_executable(tiago_client src/tiago_client.cpp)
 add_executable(tiago_server src/tiago_server.cpp)
-add_executable(tiago_motion src/tiago_motion.cpp)
 
 
 add_dependencies(tiago_client group_04_a1_generate_messages_cpp)
 add_dependencies(tiago_server group_04_a1_generate_messages_cpp)
-add_dependencies(tiago_motion group_04_a1_generate_messages_cpp)
 
 target_link_libraries(tiago_client ${catkin_LIBRARIES} ${PROJECT_NAME}_client)
 target_link_libraries(tiago_server ${catkin_LIBRARIES} ${PROJECT_NAME}_server ${PROJECT_NAME}_objfind ${PROJECT_NAME}_motion)
-target_link_libraries(tiago_motion ${catkin_LIBRARIES})
 
 
 #############
