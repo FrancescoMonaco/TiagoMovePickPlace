@@ -1,5 +1,6 @@
 #include <group_04_a2/arm.h>
 
+//*** Main
 int main(int argc, char** argv){
 
   ros::init(argc, argv, "tiago_arm");
